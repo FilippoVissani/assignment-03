@@ -104,3 +104,4 @@ project/plugins/project/
 .lib/
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,sbt
+/.bsp/sbt.json
