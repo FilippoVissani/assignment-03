@@ -2,15 +2,15 @@ package pcd.assignment03.actor_programming.entity.actor
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import pcd.assignment03.actor_programming.entity.logic.Body
-import pcd.assignment03.actor_programming.control.SimulationControllerActor.ResponseBody
+import pcd.assignment03.actor_programming.entity.Body
+import pcd.assignment03.actor_programming.control.actor.SimulationControllerActor.ControllerActorCommand.*
 
 object BodyActor:
 
   enum BodyActorCommand:
     case RequestBody(replyTo: ActorRef[ResponseBody])
-    case UpdateSpeed(bodies: List[Body], timeStep: Double)
-    case UpdatePosition(timeStep: Double)
+    case UpdatePosition(bodies: List[Body], timeStep: Double, replyTo: ActorRef[PositionUpdated])
+    case ResponseStartTime()
 
   export BodyActorCommand.*
 
@@ -21,13 +21,11 @@ object BodyActor:
         replyTo ! ResponseBody(body)
         Behaviors.same
       }
-      case UpdateSpeed(bodies: List[Body], timeStep: Double) => {
-        context.log.debug("Received UpdateSpeed")
-        BodyActor(body.updateSpeed(bodies, timeStep))
-      }
-      case UpdatePosition(timeStep: Double) => {
+      case UpdatePosition(bodies: List[Body], timeStep: Double, replyTo: ActorRef[PositionUpdated]) => {
         context.log.debug("Received UpdatePosition")
-        BodyActor(body.updatePosition(timeStep))
+        val tmpBody = body.updateSpeed(bodies, timeStep).updatePosition(timeStep)
+        replyTo ! PositionUpdated(tmpBody)
+        BodyActor(tmpBody)
       }
       case _ => {
         context.log.debug("Received Stop")

@@ -1,4 +1,4 @@
-package pcd.assignment03.actor_programming.entity.logic
+package pcd.assignment03.actor_programming.entity
 
 /**
  * Boundary of the field where bodies move.
