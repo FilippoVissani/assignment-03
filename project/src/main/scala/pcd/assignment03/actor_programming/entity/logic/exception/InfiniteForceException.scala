@@ -1,0 +1,3 @@
+package pcd.assignment03.actor_programming.entity.logic.exception
+
+class InfiniteForceException extends Exception

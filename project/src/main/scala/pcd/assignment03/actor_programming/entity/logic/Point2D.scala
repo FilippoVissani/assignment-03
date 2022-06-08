@@ -1,4 +1,4 @@
-package pcd.assignment03.actor_programming.model
+package pcd.assignment03.actor_programming.entity.logic
 
 /**
  * This trait represents a 2D point
