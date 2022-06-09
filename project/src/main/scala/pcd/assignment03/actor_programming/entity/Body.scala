@@ -49,11 +49,10 @@ trait Body:
 
 object Body:
 
-  def apply(id: Int, bounds: Boundary = Boundary(-6.0, -6.0, 6.0, 6.0)): Body =
-    val rand: Random = Random(System.currentTimeMillis())
+  def apply(id: Int, random: Random, bounds: Boundary = Boundary(-6.0, -6.0, 6.0, 6.0)): Body =
     val position = Point2D(
-      bounds.x0 * 0.25 + rand.nextDouble() * (bounds.x1 - bounds.x0) * 0.25,
-      bounds.y0 * 0.25 + rand.nextDouble() * (bounds.y1 - bounds.y0) * 0.25
+      bounds.x0 * 0.25 + random.nextDouble() * (bounds.x1 - bounds.x0) * 0.25,
+      bounds.y0 * 0.25 + random.nextDouble() * (bounds.y1 - bounds.y0) * 0.25
     )
     apply(id, position, Vector2D(0, 0), 10, bounds)
 
@@ -111,7 +110,6 @@ object Body:
             totalForce = totalForce.sum(forceByOtherBody)
           catch
             case _: Exception => throw InfiniteForceException()
-        else throw InfiniteForceException()
       totalForce = totalForce.sum(currentFrictionForce)
       totalForce.multiplyByScalar(1.0 / mass)
 

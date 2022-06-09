@@ -22,8 +22,9 @@ object RootActor:
   def apply(): Behavior[RootActorCommand] =
     Behaviors.setup(ctx =>
       var bodyActors: List[ActorRef[BodyActorCommand]] = List()
-      for (i <- 1 to 5)
-          bodyActors = ctx.spawn(BodyActor(Body(i)), s"body-actor-$i") :: bodyActors
+      val random: Random = Random(System.currentTimeMillis())
+      for (i <- 1 to 5000)
+          bodyActors = ctx.spawn(BodyActor(Body(i, random)), s"body-actor-$i") :: bodyActors
           ctx.log.info(s"Spawned Body actor id $i")
       val chronometerActor = ctx.spawn(ChronometerActor(), s"Chronometer-actor")
       ctx.log.info(s"Spawned Chronometer actor")
