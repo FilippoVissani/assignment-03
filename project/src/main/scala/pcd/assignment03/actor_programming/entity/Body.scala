@@ -3,6 +3,7 @@ package pcd.assignment03.actor_programming.entity
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import pcd.assignment03.actor_programming.entity.exception.InfiniteForceException
+import pcd.assignment03.actor_programming.util.{Boundary, Point2D}
 
 import scala.language.postfixOps
 import scala.util.Random
@@ -49,7 +50,7 @@ trait Body:
 
 object Body:
 
-  def apply(id: Int, random: Random, bounds: Boundary = Boundary(-6.0, -6.0, 6.0, 6.0)): Body =
+  def apply(id: Int, random: Random, bounds: Boundary): Body =
     val position = Point2D(
       bounds.x0 * 0.25 + random.nextDouble() * (bounds.x1 - bounds.x0) * 0.25,
       bounds.y0 * 0.25 + random.nextDouble() * (bounds.y1 - bounds.y0) * 0.25

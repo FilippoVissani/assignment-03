@@ -1,6 +1,7 @@
 package pcd.assignment03.actor_programming.entity
 
 import pcd.assignment03.actor_programming.entity.exception.NullVectorException
+import pcd.assignment03.actor_programming.util.Point2D
 
 trait Vector2D:
   /**
