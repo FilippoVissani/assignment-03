@@ -18,21 +18,22 @@ object RootActor:
 
   enum RootActorCommand:
     case Start
-    case Stop
 
   export RootActorCommand.*
 
   def apply(): Behavior[RootActorCommand] =
+    val bodiesNumber: Int = 1000
+    val maxIterations: Long = 1000
     Behaviors.setup(ctx =>
       var bodyActors: List[ActorRef[BodyActorCommand]] = List()
       val random: Random = Random(System.currentTimeMillis())
       val bounds: Boundary = Boundary(-6.0, -6.0, 6.0, 6.0)
-      for (i <- 1 to 500)
+      for (i <- 1 to bodiesNumber)
           bodyActors = ctx.spawn(BodyActor(Body(i, random, bounds)), s"body-actor-$i") :: bodyActors
           ctx.log.info(s"Spawned Body actor id $i")
       val chronometerActor = ctx.spawn(ChronometerActor(), s"Chronometer-actor")
       ctx.log.info(s"Spawned Chronometer actor")
-      val controllerActor = ctx.spawn(SimulationControllerActor(bodyActors, chronometerActor = chronometerActor), s"Controller-actor")
+      val controllerActor = ctx.spawn(SimulationControllerActor(bodyActors, maxIterations = maxIterations,chronometerActor = chronometerActor), s"Controller-actor")
       ctx.log.info(s"Spawned Controller actor")
       val viewActor = ctx.spawn(ViewActor(controllerActor, bounds, 800, 600), s"View-actor")
       ctx.log.info(s"Spawned View actor")
@@ -44,14 +45,12 @@ object RootActor:
           controllerActor ! StartSimulation
           Behaviors.same
         }
-        case Stop => {
+        case _ => {
           context.log.debug("Received Stop")
           controllerActor ! StopSimulation
           Behaviors.stopped
         }
     ))
 
-  @main def main(): Unit =
-    val system: ActorSystem[RootActorCommand] = ActorSystem(RootActor(), "root")
-    //system ! Start
+  @main def main(): Unit = ActorSystem(RootActor(), "root")
 

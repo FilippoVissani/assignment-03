@@ -30,6 +30,7 @@ object SimulationControllerActor:
   def apply(bodyActors: List[ActorRef[BodyActorCommand]],
             viewActor: Option[ActorRef[ViewActorCommand]] = Option.empty,
             chronometerActor: ActorRef[ChronometerActorCommand],
+            maxIterations: Long,
             bodies: List[Body] = List(),
             controller: SimulationController = SimulationController()
            ): Behavior[ControllerActorCommand] =
@@ -44,38 +45,36 @@ object SimulationControllerActor:
         ctx.log.debug("Received StopSimulation")
         chronometerActor ! Stop
         chronometerActor ! Duration(ctx.self)
-        Behaviors.same
+        Behaviors.stopped
       }
       case SetViewActor(viewActor: ActorRef[ViewActorCommand]) => {
         ctx.log.debug("Received SetView")
-        SimulationControllerActor(bodyActors, Option(viewActor), chronometerActor, bodies, controller)
+        SimulationControllerActor(bodyActors, Option(viewActor), chronometerActor, maxIterations, bodies, controller)
       }
       case ResponseBody(body: Body) => {
         ctx.log.debug(s"Received ResponseBody ${body.id}")
         val tmpBodies = body :: bodies
         if tmpBodies.size == bodyActors.size then
           bodyActors.foreach(bodyActor => bodyActor ! UpdatePosition(tmpBodies, controller.timeStep, ctx.self))
-          SimulationControllerActor(bodyActors, viewActor, chronometerActor, List(), controller)
+          SimulationControllerActor(bodyActors, viewActor, chronometerActor, maxIterations, List(), controller)
         else
-          SimulationControllerActor(bodyActors, viewActor, chronometerActor, tmpBodies, controller)
+          SimulationControllerActor(bodyActors, viewActor, chronometerActor, maxIterations, tmpBodies, controller)
       }
       case PositionUpdated(body: Body) => {
         ctx.log.debug("Received PositionUpdated")
         val tmpBodies = body :: bodies
         if tmpBodies.size == bodyActors.size then
           if viewActor.isDefined then viewActor.get ! Display(tmpBodies.map(body => body.position), controller.virtualTime, controller.iterations)
-          bodyActors.foreach(bodyActor => bodyActor ! RequestBody(ctx.self))
-          SimulationControllerActor(bodyActors, viewActor, chronometerActor, List(), controller.incrementIterations.incrementVirtualTime)
+          if controller.iterations < maxIterations then
+            bodyActors.foreach(bodyActor => bodyActor ! RequestBody(ctx.self))
+            SimulationControllerActor(bodyActors, viewActor, chronometerActor, maxIterations, List(), controller.incrementIterations.incrementVirtualTime)
+          else Behaviors.stopped
         else
-          SimulationControllerActor(bodyActors, viewActor, chronometerActor, tmpBodies, controller)
+          SimulationControllerActor(bodyActors, viewActor, chronometerActor, maxIterations, tmpBodies, controller)
       }
       case ResponseDuration(duration: Long) => {
         ctx.log.debug("Received ResponseDuration")
         ctx.log.info(s"ExecutionTime: $duration")
         Behaviors.same
-      }
-      case _ => {
-        ctx.log.debug("Received Stop")
-        Behaviors.stopped
       }
     )
