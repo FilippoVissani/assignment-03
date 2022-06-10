@@ -1,4 +1,4 @@
-name := "pcd-lab-akka-actors"
+name := "project"
 
 version := "1.0"
 
