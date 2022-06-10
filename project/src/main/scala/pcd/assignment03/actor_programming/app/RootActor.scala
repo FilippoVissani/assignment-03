@@ -1,15 +1,15 @@
 package pcd.assignment03.actor_programming.app
 
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import pcd.assignment03.actor_programming.boundary.View
+import pcd.assignment03.actor_programming.boundary.actor.ViewActor
 import pcd.assignment03.actor_programming.control.actor.SimulationControllerActor.ControllerActorCommand.*
 import pcd.assignment03.actor_programming.control.actor.{ChronometerActor, SimulationControllerActor}
-import pcd.assignment03.actor_programming.entity.{Body, Vector2D}
 import pcd.assignment03.actor_programming.entity.actor.BodyActor
 import pcd.assignment03.actor_programming.entity.actor.BodyActor.BodyActorCommand
+import pcd.assignment03.actor_programming.entity.{Body, Vector2D}
 import pcd.assignment03.actor_programming.util.{Boundary, Point2D}
-import pcd.assignment03.actor_programming.boundary.actor.ViewActor
-import pcd.assignment03.actor_programming.boundary.View
 
 import scala.language.postfixOps
 import scala.util.Random

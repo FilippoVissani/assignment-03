@@ -2,8 +2,8 @@ package pcd.assignment03.actor_programming.entity.actor
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import pcd.assignment03.actor_programming.entity.Body
 import pcd.assignment03.actor_programming.control.actor.SimulationControllerActor.ControllerActorCommand.*
+import pcd.assignment03.actor_programming.entity.Body
 
 object BodyActor:
 

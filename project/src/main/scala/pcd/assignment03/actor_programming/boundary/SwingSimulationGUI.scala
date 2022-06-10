@@ -1,12 +1,13 @@
 package pcd.assignment03.actor_programming.boundary
 
 import pcd.assignment03.actor_programming.util.{Boundary, Point2D}
-import swing.{Action, BorderPanel, Button, Component, Dimension, FlowPanel, Frame, Graphics2D, Panel}
-import java.awt.{BorderLayout, Dimension, Graphics2D, RenderingHints}
+
 import java.awt.event.{KeyEvent, KeyListener}
+import java.awt.{BorderLayout, Dimension, Graphics2D, RenderingHints}
 import javax.swing.{JButton, SwingUtilities}
 import scala.collection.mutable
 import scala.swing.BorderPanel.Position.*
+import scala.swing.*
 
 class SwingSimulationGUI(graphicalView: View, width: Int, height: Int) extends Frame:
   val simulationPanel: SimulationPanel = SimulationPanel(width, height, graphicalView.bounds)

@@ -1,10 +1,10 @@
 package pcd.assignment03.actor_programming.boundary
 
-import pcd.assignment03.actor_programming.util.{Boundary, Point2D}
-import pcd.assignment03.actor_programming.entity.Body
 import akka.actor.typed.ActorRef
 import pcd.assignment03.actor_programming.boundary.actor.ViewActor.ViewActorCommand
 import pcd.assignment03.actor_programming.boundary.actor.ViewActor.ViewActorCommand.*
+import pcd.assignment03.actor_programming.entity.Body
+import pcd.assignment03.actor_programming.util.{Boundary, Point2D}
 
 
 /**
