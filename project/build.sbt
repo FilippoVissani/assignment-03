@@ -14,5 +14,4 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-swing" % "3.0.0"
 )
 
-assembly / mainClass := Some("pcd.assignment03.actor_programming.app.SimulationApp")
-
+assembly / mainClass := Some("pcd.assignment03.actor_programming.app.main")
