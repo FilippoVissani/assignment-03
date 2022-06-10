@@ -1,4 +1,4 @@
-package pcd.assignment03.actor_programming.boundary
+package pcd.assignment03.actor_programming.view
 
 import pcd.assignment03.actor_programming.util.{Boundary, Point2D}
 

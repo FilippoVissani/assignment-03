@@ -1,13 +1,13 @@
-package pcd.assignment03.actor_programming.boundary.actor
+package pcd.assignment03.actor_programming.view.actor
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import pcd.assignment03.actor_programming.app.RootActor.RootActorCommand
 import pcd.assignment03.actor_programming.app.RootActor.RootActorCommand.*
-import pcd.assignment03.actor_programming.boundary.actor.ViewActor.ViewActorCommand.{StartClick, StopClick}
-import pcd.assignment03.actor_programming.boundary.{SwingSimulationGUI, View}
-import pcd.assignment03.actor_programming.control.actor.SimulationControllerActor.ControllerActorCommand
-import pcd.assignment03.actor_programming.control.actor.SimulationControllerActor.ControllerActorCommand.*
+import pcd.assignment03.actor_programming.view.actor.ViewActor.ViewActorCommand.{StartClick, StopClick}
+import pcd.assignment03.actor_programming.view.{SwingSimulationGUI, View}
+import pcd.assignment03.actor_programming.controller.actor.SimulationControllerActor.ControllerActorCommand
+import pcd.assignment03.actor_programming.controller.actor.SimulationControllerActor.ControllerActorCommand.*
 import pcd.assignment03.actor_programming.util.{Boundary, Point2D}
 
 import scala.language.postfixOps

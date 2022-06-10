@@ -1,9 +1,9 @@
-package pcd.assignment03.actor_programming.control.actor
+package pcd.assignment03.actor_programming.controller.actor
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import pcd.assignment03.actor_programming.control.Chronometer
-import pcd.assignment03.actor_programming.control.actor.SimulationControllerActor.ControllerActorCommand.*
+import pcd.assignment03.actor_programming.controller.Chronometer
+import pcd.assignment03.actor_programming.controller.actor.SimulationControllerActor.ControllerActorCommand.*
 
 object ChronometerActor:
 

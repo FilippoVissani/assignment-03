@@ -1,8 +1,8 @@
-package pcd.assignment03.actor_programming.entity
+package pcd.assignment03.actor_programming.model
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import pcd.assignment03.actor_programming.entity.exception.InfiniteForceException
+import pcd.assignment03.actor_programming.model.exception.InfiniteForceException
 import pcd.assignment03.actor_programming.util.{Boundary, Point2D}
 
 import scala.language.postfixOps

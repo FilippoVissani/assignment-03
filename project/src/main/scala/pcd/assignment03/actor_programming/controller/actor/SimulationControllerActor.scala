@@ -1,17 +1,17 @@
-package pcd.assignment03.actor_programming.control.actor
+package pcd.assignment03.actor_programming.controller.actor
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import pcd.assignment03.actor_programming.app.RootActor.RootActorCommand
-import pcd.assignment03.actor_programming.boundary.View
-import pcd.assignment03.actor_programming.boundary.actor.ViewActor.ViewActorCommand
-import pcd.assignment03.actor_programming.boundary.actor.ViewActor.ViewActorCommand.*
-import pcd.assignment03.actor_programming.control.actor.ChronometerActor.ChronometerActorCommand
-import pcd.assignment03.actor_programming.control.actor.ChronometerActor.ChronometerActorCommand.*
-import pcd.assignment03.actor_programming.control.{Chronometer, SimulationController}
-import pcd.assignment03.actor_programming.entity.Body
-import pcd.assignment03.actor_programming.entity.actor.BodyActor.BodyActorCommand
-import pcd.assignment03.actor_programming.entity.actor.BodyActor.BodyActorCommand.*
+import pcd.assignment03.actor_programming.view.View
+import pcd.assignment03.actor_programming.view.actor.ViewActor.ViewActorCommand
+import pcd.assignment03.actor_programming.view.actor.ViewActor.ViewActorCommand.*
+import pcd.assignment03.actor_programming.controller.actor.ChronometerActor.ChronometerActorCommand
+import pcd.assignment03.actor_programming.controller.actor.ChronometerActor.ChronometerActorCommand.*
+import pcd.assignment03.actor_programming.controller.{Chronometer, SimulationController}
+import pcd.assignment03.actor_programming.model.Body
+import pcd.assignment03.actor_programming.model.actor.BodyActor.BodyActorCommand
+import pcd.assignment03.actor_programming.model.actor.BodyActor.BodyActorCommand.*
 import pcd.assignment03.actor_programming.util.Logger
 
 import java.time.LocalDateTime

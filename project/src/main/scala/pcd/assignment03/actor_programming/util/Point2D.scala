@@ -1,6 +1,6 @@
 package pcd.assignment03.actor_programming.util
 
-import pcd.assignment03.actor_programming.entity.Vector2D
+import pcd.assignment03.actor_programming.model.Vector2D
 
 /**
  * This trait represents a 2D point

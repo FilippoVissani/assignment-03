@@ -1,4 +1,4 @@
-package pcd.assignment03.actor_programming.control
+package pcd.assignment03.actor_programming.controller
 
 /**
  * Trait used to represent a chronometer
