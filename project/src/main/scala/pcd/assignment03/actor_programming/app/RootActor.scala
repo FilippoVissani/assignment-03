@@ -21,9 +21,7 @@ object RootActor:
 
   export RootActorCommand.*
 
-  def apply(): Behavior[RootActorCommand] =
-    val bodiesNumber: Int = 2000
-    val maxIterations: Long = 10000
+  def apply(bodiesNumber: Int, maxIterations: Long, withView: Boolean): Behavior[RootActorCommand] =
     Behaviors.setup(ctx =>
       var bodyActors: List[ActorRef[BodyActorCommand]] = List()
       val random: Random = Random(System.currentTimeMillis())
@@ -35,22 +33,20 @@ object RootActor:
       ctx.log.info(s"Spawned Chronometer actor")
       val controllerActor = ctx.spawn(SimulationControllerActor(bodyActors, maxIterations = maxIterations,chronometerActor = chronometerActor), s"Controller-actor")
       ctx.log.info(s"Spawned Controller actor")
-      val viewActor = ctx.spawn(ViewActor(controllerActor, bounds, 800, 600), s"View-actor")
-      ctx.log.info(s"Spawned View actor")
-      controllerActor ! SetViewActor(viewActor)
+      if withView then
+        val viewActor = ctx.spawn(ViewActor(controllerActor, bounds, 800, 600), s"View-actor")
+          ctx.log.info(s"Spawned View actor")
+        controllerActor ! SetViewActor(viewActor)
 
       Behaviors.receive((context, msg) => msg match
-        case Start => {
-          context.log.debug("Received StartSimulation")
-          controllerActor ! StartSimulation
-          Behaviors.same
-        }
-        case _ => {
-          context.log.debug("Received Stop")
-          controllerActor ! StopSimulation
-          Behaviors.stopped
-        }
+      case Start => {
+        context.log.debug("Received StartSimulation")
+        controllerActor ! StartSimulation
+        Behaviors.same
+      }
+      case _ => {
+        context.log.debug("Received Stop")
+        controllerActor ! StopSimulation
+        Behaviors.stopped
+      }
     ))
-
-  @main def main(): Unit = ActorSystem(RootActor(), "root")
-
