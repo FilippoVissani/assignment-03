@@ -10,7 +10,7 @@ object BodyActor:
   enum BodyActorCommand:
     case RequestBody(replyTo: ActorRef[ResponseBody])
     case UpdatePosition(bodies: List[Body], timeStep: Double, replyTo: ActorRef[PositionUpdated])
-    case ResponseStartTime()
+    case StopBodyActor
 
   export BodyActorCommand.*
 

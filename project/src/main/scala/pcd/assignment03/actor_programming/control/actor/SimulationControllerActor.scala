@@ -44,8 +44,9 @@ object SimulationControllerActor:
       case StopSimulation => {
         ctx.log.debug("Received StopSimulation")
         chronometerActor ! Stop
+        bodyActors.foreach(bodyActor => bodyActor ! StopBodyActor)
         chronometerActor ! Duration(ctx.self)
-        Behaviors.stopped
+        Behaviors.same
       }
       case SetViewActor(viewActor: ActorRef[ViewActorCommand]) => {
         ctx.log.debug("Received SetView")
@@ -68,13 +69,16 @@ object SimulationControllerActor:
           if controller.iterations < maxIterations then
             bodyActors.foreach(bodyActor => bodyActor ! RequestBody(ctx.self))
             SimulationControllerActor(bodyActors, viewActor, chronometerActor, maxIterations, List(), controller.incrementIterations.incrementVirtualTime)
-          else Behaviors.stopped
+          else
+            ctx.log.debug("Max iterations reached")
+            ctx.self ! StopSimulation
+            Behaviors.same
         else
           SimulationControllerActor(bodyActors, viewActor, chronometerActor, maxIterations, tmpBodies, controller)
       }
       case ResponseDuration(duration: Long) => {
         ctx.log.debug("Received ResponseDuration")
-        ctx.log.info(s"ExecutionTime: $duration")
-        Behaviors.same
+        ctx.log.debug(s"ExecutionTime: $duration")
+        Behaviors.stopped
       }
     )

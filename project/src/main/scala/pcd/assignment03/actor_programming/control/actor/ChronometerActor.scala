@@ -27,7 +27,7 @@ object ChronometerActor:
       case Duration(replyTo: ActorRef[ResponseDuration]) => {
         context.log.debug("Received Duration")
         replyTo ! ResponseDuration(chronometer.duration)
-        Behaviors.same
+        Behaviors.stopped
       }
       case _ => Behaviors.stopped
     )
