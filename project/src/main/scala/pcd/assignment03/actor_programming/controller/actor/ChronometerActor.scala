@@ -15,17 +15,17 @@ object ChronometerActor:
   export ChronometerActorCommand.*
 
   def apply(chronometer: Chronometer = Chronometer()): Behavior[ChronometerActorCommand] =
-    Behaviors.receive((context, msg) => msg match
+    Behaviors.receive((ctx, msg) => msg match
       case Start => {
-        context.log.debug("Received Start")
+        ctx.log.debug("Received Start")
         ChronometerActor(chronometer.start())
       }
       case Stop => {
-        context.log.debug("Received Stop")
+        ctx.log.debug("Received Stop")
         ChronometerActor(chronometer.stop())
       }
       case Duration(replyTo: ActorRef[ResponseDuration]) => {
-        context.log.debug("Received Duration")
+        ctx.log.debug("Received Duration")
         replyTo ! ResponseDuration(chronometer.duration)
         Behaviors.stopped
       }

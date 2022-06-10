@@ -15,20 +15,20 @@ object BodyActor:
   export BodyActorCommand.*
 
   def apply(body: Body): Behavior[BodyActorCommand] =
-    Behaviors.receive((context, msg) => msg match
+    Behaviors.receive((ctx, msg) => msg match
       case RequestBody(replyTo: ActorRef[ResponseBody]) => {
-        context.log.debug("Received RequestBody")
+        ctx.log.debug("Received RequestBody")
         replyTo ! ResponseBody(body)
         Behaviors.same
       }
       case UpdatePosition(bodies: List[Body], timeStep: Double, replyTo: ActorRef[PositionUpdated]) => {
-        context.log.debug("Received UpdatePosition")
+        ctx.log.debug("Received UpdatePosition")
         val tmpBody = body.updateSpeed(bodies, timeStep).updatePosition(timeStep)
         replyTo ! PositionUpdated(tmpBody)
         BodyActor(tmpBody)
       }
       case _ => {
-        context.log.debug("Received Stop")
+        ctx.log.debug("Received Stop")
         Behaviors.stopped
       }
     )

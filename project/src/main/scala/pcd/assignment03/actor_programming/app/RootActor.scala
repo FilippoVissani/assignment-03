@@ -38,14 +38,14 @@ object RootActor:
           ctx.log.info(s"Spawned View actor")
         controllerActor ! SetViewActor(viewActor)
 
-      Behaviors.receive((context, msg) => msg match
+      Behaviors.receive((ctx, msg) => msg match
       case Start => {
-        context.log.debug("Received StartSimulation")
+        ctx.log.debug("Received StartSimulation")
         controllerActor ! StartSimulation
         Behaviors.same
       }
       case _ => {
-        context.log.debug("Received Stop")
+        ctx.log.debug("Received Stop")
         controllerActor ! StopSimulation
         Behaviors.stopped
       }
