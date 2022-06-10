@@ -12,6 +12,10 @@ import pcd.assignment03.actor_programming.control.{Chronometer, SimulationContro
 import pcd.assignment03.actor_programming.entity.Body
 import pcd.assignment03.actor_programming.entity.actor.BodyActor.BodyActorCommand
 import pcd.assignment03.actor_programming.entity.actor.BodyActor.BodyActorCommand.*
+import pcd.assignment03.actor_programming.util.Logger
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object SimulationControllerActor:
 
@@ -37,6 +41,8 @@ object SimulationControllerActor:
     Behaviors.receive((ctx, msg) => msg match
       case StartSimulation => {
         ctx.log.debug("Received StartSimulation")
+        val logger: Logger = Logger()
+        logger.logSimulationStarted()
         chronometerActor ! Start
         bodyActors.foreach(bodyActor => bodyActor ! RequestBody(ctx.self))
         Behaviors.same
@@ -79,6 +85,9 @@ object SimulationControllerActor:
       case ResponseDuration(duration: Long) => {
         ctx.log.debug("Received ResponseDuration")
         ctx.log.debug(s"ExecutionTime: $duration")
+        val logger: Logger = Logger()
+        logger.logSimulationResult(bodyActors.size, maxIterations, duration)
+        logger.logSimulationTerminated()
         Behaviors.stopped
       }
     )

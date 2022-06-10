@@ -23,7 +23,7 @@ object RootActor:
 
   def apply(): Behavior[RootActorCommand] =
     val bodiesNumber: Int = 1000
-    val maxIterations: Long = 100
+    val maxIterations: Long = 1000
     Behaviors.setup(ctx =>
       var bodyActors: List[ActorRef[BodyActorCommand]] = List()
       val random: Random = Random(System.currentTimeMillis())

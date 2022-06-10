@@ -6,8 +6,8 @@ import java.awt.event.{KeyEvent, KeyListener}
 import java.awt.{BorderLayout, Dimension, Graphics2D, RenderingHints}
 import javax.swing.{JButton, SwingUtilities}
 import scala.collection.mutable
-import scala.swing.BorderPanel.Position.*
 import scala.swing.*
+import scala.swing.BorderPanel.Position.*
 
 class SwingSimulationGUI(graphicalView: View, width: Int, height: Int) extends Frame:
   val simulationPanel: SimulationPanel = SimulationPanel(width, height, graphicalView.bounds)

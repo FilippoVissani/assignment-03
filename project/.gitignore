@@ -105,3 +105,4 @@ project/plugins/project/
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,sbt
 /.bsp/sbt.json
+/simulation.log
