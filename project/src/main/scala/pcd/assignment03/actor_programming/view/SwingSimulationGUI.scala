@@ -1,22 +1,32 @@
 package pcd.assignment03.actor_programming.view
 
+import com.sun.java.accessibility.util.AWTEventMonitor.{addKeyListener, addWindowListener}
 import pcd.assignment03.actor_programming.util.{Boundary, Point2D}
 
-import java.awt.event.{KeyEvent, KeyListener}
+import java.awt.event.{KeyEvent, KeyListener, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Dimension, Graphics2D, RenderingHints}
-import javax.swing.{JButton, SwingUtilities}
+import javax.swing.SwingUtilities
 import scala.collection.mutable
+import scala.language.postfixOps
 import scala.swing.*
 import scala.swing.BorderPanel.Position.*
 
 class SwingSimulationGUI(graphicalView: View, width: Int, height: Int) extends Frame:
   val simulationPanel: SimulationPanel = SimulationPanel(width, height, graphicalView.bounds)
 
+  addWindowListener(new WindowAdapter() {
+    override def windowClosing(ev: WindowEvent): Unit =
+      System.exit(-1)
+
+    override def windowClosed(ev: WindowEvent): Unit =
+      System.exit(-1)
+  })
+
   title = "Bodies Simulation"
   size = Dimension(width, height)
   resizable = false
   contents = new BorderPanel{
-    layout(ButtonsPanel(graphicalView)) = North
+    layout(ButtonsPanel(graphicalView, simulationPanel)) = North
     layout(simulationPanel) = Center
   }
   visible = true
@@ -30,7 +40,7 @@ class SwingSimulationGUI(graphicalView: View, width: Int, height: Int) extends F
     })
 end SwingSimulationGUI
 
-private class ButtonsPanel(graphicalView: View) extends FlowPanel:
+sealed class ButtonsPanel(graphicalView: View, simulationPanel: SimulationPanel) extends FlowPanel:
   val buttonStart: Button = new Button {
     text = "Start"
     action = new Action("start"):
@@ -47,13 +57,29 @@ private class ButtonsPanel(graphicalView: View) extends FlowPanel:
         enabled = false
         graphicalView.stopSimulation()
   }
+  val buttonPlus: Button = new Button{
+    text = "+"
+    enabled = false
+    action = new Action("+"):
+      override def apply(): Unit =
+        simulationPanel.zoomIn()
+  }
+  val buttonMinus: Button = new Button{
+    text = "-"
+    enabled = false
+    action = new Action("-"):
+      override def apply(): Unit =
+        simulationPanel.zoomOut()
+  }
 
   contents += buttonStart
   contents += buttonStop
+  contents += buttonPlus
+  contents += buttonMinus
 
 end ButtonsPanel
 
-sealed class SimulationPanel(width: Int, height: Int, bounds: Boundary) extends Panel with KeyListener:
+sealed class SimulationPanel(width: Int, height: Int, bounds: Boundary) extends Panel:
   var bodiesPositions: List[Point2D] = List()
   var currentIteration: Long = 0
   var virtualTime: Double = 0
@@ -86,7 +112,7 @@ sealed class SimulationPanel(width: Int, height: Int, bounds: Boundary) extends 
         g2.drawOval(xCoord(position.x), yCoord(position.y), radius, radius)
       })
       val time: String = String.format("%.2f", virtualTime)
-      g2.drawString("Bodies: " + bodiesPositions.size + " - vt: " + time + " - nIter: " + currentIteration + " (UP for zoom in, DOWN for zoom out)", 2, 20)
+      g2.drawString("Bodies: " + bodiesPositions.size + " - vt: " + time + " - nIter: " + currentIteration, 2, 20)
   end paint
 
   private def xCoord(x: Double): Int = (dx + x * dx * scale).toInt
@@ -98,18 +124,10 @@ sealed class SimulationPanel(width: Int, height: Int, bounds: Boundary) extends 
     this.virtualTime = vt
     this.currentIteration = iter
 
-  private def zoomIn(): Unit =
+  def zoomIn(): Unit =
     scale *= 1.1
 
-  private def zoomOut(): Unit =
+  def zoomOut(): Unit =
     scale *= 0.9
-
-  override def keyPressed(e: KeyEvent): Unit =
-    if (e.getKeyCode == 38) /* KEY UP */ this.zoomIn()
-    else if (e.getKeyCode == 40) /* KEY DOWN */ this.zoomOut()
-
-  override def keyReleased(e: KeyEvent): Unit = {}
-
-  override def keyTyped(e: KeyEvent): Unit = {}
 
 end SimulationPanel

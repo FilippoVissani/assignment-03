@@ -86,7 +86,7 @@ object SimulationControllerActor:
         ctx.log.debug("Received ResponseDuration")
         ctx.log.debug(s"ExecutionTime: $duration")
         val logger: Logger = Logger()
-        logger.logSimulationResult(bodyActors.size, maxIterations, duration)
+        logger.logSimulationResult(bodyActors.size, controller.iterations, duration)
         logger.logSimulationTerminated()
         Behaviors.stopped
       }
