@@ -1,4 +1,4 @@
-package pcd.assignment03.distributed_programming
+package pcd.assignment03.distributed_programming.model
 
 /**
  * Boundary of the field where bodies move.

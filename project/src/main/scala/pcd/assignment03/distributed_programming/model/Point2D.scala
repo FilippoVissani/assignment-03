@@ -1,4 +1,4 @@
-package pcd.assignment03.distributed_programming
+package pcd.assignment03.distributed_programming.model
 
 /**
  * This trait represents a 2D point

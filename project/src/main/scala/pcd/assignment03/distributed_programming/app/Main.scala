@@ -2,12 +2,9 @@ package pcd.assignment03.distributed_programming.app
 
 import akka.actor.typed.{ActorSystem, Behavior}
 import com.typesafe.config.{Config, ConfigFactory}
-import pcd.assignment03.distributed_programming.{Boundary, Point2D}
-import pcd.assignment03.distributed_programming.zone.Zone
-import pcd.assignment03.distributed_programming.zone.ZoneState.*
-import pcd.assignment03.distributed_programming.fire_station.FireStation
-import pcd.assignment03.distributed_programming.fire_station.FireStationState.*
-import pcd.assignment03.distributed_programming.pluviometer.Pluviometer
+import pcd.assignment03.distributed_programming.model.Zone.ZoneState.*
+import pcd.assignment03.distributed_programming.model.FireStation.FireStationState.*
+import pcd.assignment03.distributed_programming.model.{Boundary, FireStation, Pluviometer, Point2D, Zone}
 
 import scala.util.Random
 
