@@ -15,7 +15,7 @@ object Main:
     var k: Int = 0
     for i <- 0 until rows do
       for j <- 0 until columns do
-        zones = Zone(k,
+        zones = Zone(s"zone$k",
           Boundary(i * zoneSize.width, j * zoneSize.height, (i * zoneSize.width + zoneSize.width) - 1, (j * zoneSize.height + zoneSize.height) - 1),
           Ok,
           15) :: zones
@@ -36,7 +36,7 @@ object Main:
     val circularZones = Iterator.continually(zones).flatten.take(6)
     var pluviometerId: Int = 0
     circularZones.foreach(x => {
-      pluviometers = Pluviometer(pluviometerId, x.id, Point2D(random.nextInt(x.bounds.width.toInt) + x.bounds.x0, random.nextInt(x.bounds.height.toInt) + x.bounds.y0)) :: pluviometers
+      pluviometers = Pluviometer(s"pluviometer$pluviometerId", x.id, Point2D(random.nextInt(x.bounds.width.toInt) + x.bounds.x0, random.nextInt(x.bounds.height.toInt) + x.bounds.y0)) :: pluviometers
       pluviometerId = pluviometerId + 1
     })
     pluviometers

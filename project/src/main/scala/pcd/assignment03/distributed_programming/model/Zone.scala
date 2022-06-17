@@ -3,7 +3,7 @@ package pcd.assignment03.distributed_programming.model
 import pcd.assignment03.distributed_programming.model.Zone.ZoneState
 
 trait Zone:
-  def id: Int
+  def id: String
   def bounds: Boundary
   def state: ZoneState
   def threshold: Float
@@ -16,10 +16,10 @@ object Zone:
   
   export ZoneState.*
 
-  def apply(id: Int, bounds: Boundary, state: ZoneState, threshold: Float): Zone =
+  def apply(id: String, bounds: Boundary, state: ZoneState, threshold: Float): Zone =
     ZoneImpl(id, bounds, state, threshold)
 
-  private case class ZoneImpl(override val id: Int,
+  private case class ZoneImpl(override val id: String,
                               override val bounds: Boundary,
                               override val state: ZoneState,
                               override val threshold: Float) extends Zone:
