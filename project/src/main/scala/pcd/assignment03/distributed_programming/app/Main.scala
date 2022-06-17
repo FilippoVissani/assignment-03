@@ -20,7 +20,8 @@ object Main:
       for j <- 0 until columns do
         zones = Zone(k,
           Boundary(i * zoneSize.width, j * zoneSize.height, (i * zoneSize.width + zoneSize.width) - 1, (j * zoneSize.height + zoneSize.height) - 1),
-          Ok) :: zones
+          Ok,
+          15) :: zones
         k = k + 1
     zones
 
@@ -36,7 +37,11 @@ object Main:
     var pluviometers: List[Pluviometer] = List()
     val random: Random = Random(System.currentTimeMillis())
     val circularZones = Iterator.continually(zones).flatten.take(6)
-    circularZones.foreach(x => pluviometers = Pluviometer(x.id, Point2D(random.nextInt(x.bounds.width.toInt) + x.bounds.x0, random.nextInt(x.bounds.height.toInt) + x.bounds.y0)) :: pluviometers)
+    var pluviometerId: Int = 0
+    circularZones.foreach(x => {
+      pluviometers = Pluviometer(pluviometerId, x.id, Point2D(random.nextInt(x.bounds.width.toInt) + x.bounds.x0, random.nextInt(x.bounds.height.toInt) + x.bounds.y0)) :: pluviometers
+      pluviometerId = pluviometerId + 1
+    })
     pluviometers
 
   @main def main(width: Int, height: Int, rows: Int, columns: Int): Unit =
