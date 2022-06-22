@@ -1,7 +1,6 @@
 package pcd.assignment03.distributed_programming.actors
 
 import akka.actor
-
 import scala.util.{Failure, Success}
 import akka.pattern.ask
 import akka.actor.{AbstractActorWithTimers, Actor, Timers}
@@ -22,21 +21,19 @@ enum IsAlarmResponseResult:
 
 export IsAlarmResponseResult.*
 
-trait CommonCommands
-case class IsMyZoneRequest(zoneId: String, replyTo: ActorRef[PluviometerActorCommand]) extends Message with CommonCommands
-
-trait PluviometerActorCommand extends CommonCommands
+trait PluviometerActorCommand
 object Tick extends Message with PluviometerActorCommand
-case class IsMyZoneResponse(replyTo: ActorRef[_]) extends Message with PluviometerActorCommand
 case class RequestIsAlarm(replyTo: ActorRef[PluviometerActorCommand]) extends Message with PluviometerActorCommand
 case class IsAlarmResponse(isAlarm: IsAlarmResponseResult) extends Message with PluviometerActorCommand
+case class IsMyZoneRequestPluviometer(zoneId: Int, replyTo: ActorRef[_]) extends Message with PluviometerActorCommand
+case class IsMyZoneResponsePluviometer(replyTo: ActorRef[_]) extends Message with PluviometerActorCommand
 
 val pluviometerService = ServiceKey[PluviometerActorCommand]("pluviometerService")
 
 object PluviometerActor:
 
   def apply(pluviometer: Pluviometer,
-            pluviometerActors: Set[ActorRef[PluviometerActorCommand]] = Set(),
+            pluviometerActors: Set[ActorRef[PluviometerActorCommand]],
             alarms: List[IsAlarmResponseResult],
             fireStationActor: Option[ActorRef[FireStationActorCommand]]): Behavior[PluviometerActorCommand | Receptionist.Listing] =
     Behaviors.setup[PluviometerActorCommand | Receptionist.Listing] { ctx =>
@@ -44,23 +41,28 @@ object PluviometerActor:
       ctx.system.receptionist ! Receptionist.register(pluviometerService, ctx.self)
       ctx.system.receptionist ! Receptionist.Subscribe(pluviometerService, ctx.self)
       ctx.system.receptionist ! Receptionist.Subscribe(fireStationService, ctx.self)
+      ctx.system.receptionist ! Receptionist.Subscribe(viewService, ctx.self)
       Behaviors.withTimers { timers =>
         timers.startTimerAtFixedRate(Tick, 5.seconds)
         Behaviors.receiveMessage {
           case msg: Receptionist.Listing => {
             msg
               .serviceInstances(pluviometerService)
-              .foreach(actor => actor ! IsMyZoneRequest(pluviometer.zoneId, ctx.self).asInstanceOf[PluviometerActorCommand])
+              .foreach(actor => actor ! IsMyZoneRequestPluviometer(pluviometer.zoneId, ctx.self).asInstanceOf[PluviometerActorCommand])
             msg
               .serviceInstances(fireStationService)
-              .foreach(actor => actor ! IsMyZoneRequest(pluviometer.zoneId, ctx.self).asInstanceOf[FireStationActorCommand])
+              .foreach(actor => actor ! IsMyZoneRequestFireStation(pluviometer.zoneId, ctx.self).asInstanceOf[FireStationActorCommand])
+            msg
+              .serviceInstances(viewService)
+              .foreach(actor => actor ! UpdatePluviometer(pluviometer))
             Behaviors.same
           }
-          case IsMyZoneRequest(zoneId, replyTo) => {
-            if pluviometer.zoneId == zoneId then replyTo ! IsMyZoneResponse(ctx.self)
+          case IsMyZoneRequestPluviometer(zoneId, replyTo) => {
+            if pluviometer.zoneId == zoneId then replyTo match
+              case replyTo: ActorRef[PluviometerActorCommand] => replyTo ! IsMyZoneResponsePluviometer(ctx.self)
             Behaviors.same
           }
-          case IsMyZoneResponse(replyTo) => {
+          case IsMyZoneResponsePluviometer(replyTo) => {
             replyTo match
               case replyTo: ActorRef[FireStationActorCommand] =>
                 PluviometerActor(pluviometer, pluviometerActors, alarms, Option(replyTo))

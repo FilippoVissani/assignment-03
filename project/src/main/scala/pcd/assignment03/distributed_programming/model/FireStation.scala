@@ -3,7 +3,7 @@ package pcd.assignment03.distributed_programming.model
 import pcd.assignment03.distributed_programming.model.FireStation.FireStationState
 
 trait FireStation:
-   def zoneId: String
+   def zoneId: Int
    def position: Point2D
    def state: FireStationState
    def state_(newState: FireStationState): FireStation
@@ -15,10 +15,10 @@ object FireStation:
       
    export FireStationState.*
 
-   def apply(zoneId: String, position: Point2D, state: FireStationState): FireStation =
+   def apply(zoneId: Int, position: Point2D, state: FireStationState): FireStation =
       FireStationImpl(zoneId, position, state)
 
-   private case class FireStationImpl(override val zoneId: String,
+   private case class FireStationImpl(override val zoneId: Int,
                                       override val position: Point2D,
                                       override val state: FireStationState) extends FireStation:
 
