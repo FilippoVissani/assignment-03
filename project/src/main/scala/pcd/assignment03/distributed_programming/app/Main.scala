@@ -2,10 +2,8 @@ package pcd.assignment03.distributed_programming.app
 
 import akka.actor.typed.{ActorSystem, Behavior}
 import com.typesafe.config.{Config, ConfigFactory}
-import pcd.assignment03.distributed_programming.model.Zone.ZoneState.*
 import pcd.assignment03.distributed_programming.model.FireStation.FireStationState.*
 import pcd.assignment03.distributed_programming.model.{Boundary, FireStation, Pluviometer, Point2D, Zone}
-
 import scala.util.Random
 
 object Main:
@@ -16,9 +14,7 @@ object Main:
     for i <- 0 until rows do
       for j <- 0 until columns do
         zones = Zone(s"zone$k",
-          Boundary(i * zoneSize.width, j * zoneSize.height, (i * zoneSize.width + zoneSize.width) - 1, (j * zoneSize.height + zoneSize.height) - 1),
-          Ok,
-          15) :: zones
+          Boundary(i * zoneSize.width, j * zoneSize.height, (i * zoneSize.width + zoneSize.width) - 1, (j * zoneSize.height + zoneSize.height) - 1)) :: zones
         k = k + 1
     zones
 
@@ -36,7 +32,10 @@ object Main:
     val circularZones = Iterator.continually(zones).flatten.take(6)
     var pluviometerId: Int = 0
     circularZones.foreach(x => {
-      pluviometers = Pluviometer(s"pluviometer$pluviometerId", x.id, Point2D(random.nextInt(x.bounds.width.toInt) + x.bounds.x0, random.nextInt(x.bounds.height.toInt) + x.bounds.y0)) :: pluviometers
+      pluviometers = Pluviometer(s"pluviometer$pluviometerId",
+        x.id,
+        Point2D(random.nextInt(x.bounds.width.toInt) + x.bounds.x0, random.nextInt(x.bounds.height.toInt) + x.bounds.y0),
+        15) :: pluviometers
       pluviometerId = pluviometerId + 1
     })
     pluviometers
@@ -54,7 +53,7 @@ object Main:
 
   @main def startNewControlPanel(): Unit = ???
 
-  def startup[X](file: String = "pluviometer-cluster", port: Int)(root: => Behavior[X]): ActorSystem[X] =
+  def startup[X](file: String = "cluster", port: Int)(root: => Behavior[X]): ActorSystem[X] =
     // Override the configuration of the port
     val config: Config = ConfigFactory
       .parseString(s"""akka.remote.artery.canonical.port=$port""")

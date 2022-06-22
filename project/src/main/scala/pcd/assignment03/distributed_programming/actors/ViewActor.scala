@@ -9,7 +9,6 @@ object ViewActor:
   enum ViewActorCommand:
     case PluviometerResponse(pluviometer: Pluviometer)
     case FireStationResponse(fireStation: FireStation)
-    case ZoneResponse(zone: Zone)
     case FixZone
     case ManageZone
 
@@ -29,11 +28,6 @@ object ViewActor:
         case FireStationResponse(fireStation: FireStation) => {
           ctx.log.debug("ViewActor Received FireStationResponse")
           view.displayFireStation(fireStation)
-          Behaviors.same
-        }
-        case ZoneResponse(zone: Zone) => {
-          ctx.log.debug("ViewActor Received ZoneResponse")
-          view.displayZone(zone)
           Behaviors.same
         }
         case FixZone => {
