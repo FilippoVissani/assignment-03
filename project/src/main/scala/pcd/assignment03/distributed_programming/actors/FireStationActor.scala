@@ -26,35 +26,30 @@ object FireStationActor:
       Behaviors.receiveMessage {
         case msg: Receptionist.Listing => {
           ctx.log.debug("Received Receptionist.Listing")
-          //TODO FireStationActor(fireStation, zone, msg.serviceInstances(viewService))
-          Behaviors.same //TODO
+          FireStationActor(fireStation, zone, msg.serviceInstances(viewService))
         }
         case WarnFireStation => {
           ctx.log.debug("Received WarnFireStation")
-          //TODO if fireStation.state == Free then FireStationActor(fireStation.state_(Warned), zone.state_(ZoneState.Alarm), viewActors)
-          //else Behaviors.same
-          Behaviors.same //TODO
+          if fireStation.state == Free then FireStationActor(fireStation.state_(Warned), zone.state_(ZoneState.Alarm), viewActors)
+          else Behaviors.same
         }
         case FreeFireStation => {
           ctx.log.debug("Received FreeFireStation")
-          //TODO FireStationActor(fireStation.state_(Free), zone.state_(ZoneState.Ok), viewActors)
-          Behaviors.same //TODO
+          FireStationActor(fireStation.state_(Free), zone.state_(ZoneState.Ok), viewActors)
         }
         case BusyFireStation => {
           ctx.log.debug("Received BusyFireStation")
-          //TODO FireStationActor(fireStation.state_(Busy), zone.state_(ZoneState.UnderManagement), viewActors)
-          Behaviors.same //TODO
+          FireStationActor(fireStation.state_(Busy), zone.state_(ZoneState.UnderManagement), viewActors)
         }
         case IsMyZoneRequestFireStation(zoneId, replyTo) => {
           ctx.log.debug("Received IsMyZoneRequestFireStation")
-          /*TODOif fireStation.zoneId == zoneId then replyTo match
+          if fireStation.zoneId == zoneId then replyTo match
             case replyTo: ActorRef[PluviometerActorCommand] => replyTo ! IsMyZoneResponsePluviometer(ctx.self)
-            case replyTo: ActorRef[ViewActorCommand] => replyTo ! IsMyZoneResponseView(ctx.self)*/
+            case replyTo: ActorRef[ViewActorCommand] => replyTo ! IsMyZoneResponseView(ctx.self)
           Behaviors.same
         }
         case _ => {
-          //TODO Behaviors.stopped
-          Behaviors.same //TODO
+          Behaviors.stopped
         }
       }
     }
