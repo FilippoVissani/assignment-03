@@ -16,7 +16,7 @@ object ViewGuardianActor:
       Behaviors.receiveMessagePartial[Receptionist.Listing] {
         case fireStationService.Listing(listings) =>{
           ctx.log.debug("Received fireStationService")
-          listings.foreach(actor => actor ! IsMyZoneRequestFireStation(zoneId, viewActor))
+          listings.foreach(actor => actor ! IsMyZoneRequestFromViewToFireStation(zoneId, viewActor))
           Behaviors.same
         }
         case _ => Behaviors.stopped

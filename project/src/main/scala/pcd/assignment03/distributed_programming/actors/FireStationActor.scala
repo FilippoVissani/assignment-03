@@ -11,7 +11,8 @@ trait FireStationActorCommand
 object WarnFireStation extends Message with FireStationActorCommand
 object FreeFireStation extends Message with FireStationActorCommand
 object BusyFireStation extends Message with FireStationActorCommand
-case class IsMyZoneRequestFireStation(zoneId: Int, replyTo: ActorRef[_]) extends Message with FireStationActorCommand
+case class IsMyZoneRequestFromViewToFireStation(zoneId: Int, replyTo: ActorRef[ViewActorCommand]) extends Message with FireStationActorCommand
+case class IsMyZoneRequestFromPluviometerToFireStation(zoneId: Int, replyTo: ActorRef[PluviometerActorCommand]) extends Message with FireStationActorCommand
 case class SetViews(views: Set[ActorRef[ViewActorCommand]]) extends Message with FireStationActorCommand
 
 val fireStationService = ServiceKey[FireStationActorCommand]("fireStationService")
@@ -30,7 +31,9 @@ object FireStationActor:
         }
         case WarnFireStation => {
           ctx.log.debug("Received WarnFireStation")
-          if fireStation.state == Free then FireStationActor(fireStation.state_(Warned), zone.state_(ZoneState.Alarm), viewActors)
+          if fireStation.state == Free then {
+            FireStationActor(fireStation.state_(Warned), zone.state_(ZoneState.Alarm), viewActors)
+          }
           else Behaviors.same
         }
         case FreeFireStation => {
@@ -41,11 +44,16 @@ object FireStationActor:
           ctx.log.debug("Received BusyFireStation")
           FireStationActor(fireStation.state_(Busy), zone.state_(ZoneState.UnderManagement), viewActors)
         }
-        case IsMyZoneRequestFireStation(zoneId, replyTo) => {
+        case IsMyZoneRequestFromViewToFireStation(zoneId, replyTo) => {
           ctx.log.debug("Received IsMyZoneRequestFireStation")
-          if fireStation.zoneId == zoneId then replyTo match
-            case replyTo: ActorRef[PluviometerActorCommand] => replyTo ! IsMyZoneResponsePluviometer(ctx.self)
-            case replyTo: ActorRef[ViewActorCommand] => replyTo ! IsMyZoneResponseView(ctx.self)
+          if fireStation.zoneId == zoneId then
+            replyTo ! IsMyZoneResponseView(ctx.self)
+          Behaviors.same
+        }
+        case IsMyZoneRequestFromPluviometerToFireStation(zoneId, replyTo) => {
+          ctx.log.debug("Received IsMyZoneRequestFireStation")
+          if fireStation.zoneId == zoneId then
+            replyTo ! IsMyZoneResponsePluviometer(ctx.self)
           Behaviors.same
         }
         case _ => {

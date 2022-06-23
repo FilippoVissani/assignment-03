@@ -21,7 +21,7 @@ object PluviometerGuardianActor:
         }
         case fireStationService.Listing(listings) =>{
           ctx.log.debug("Received fireStationService")
-          listings.foreach(actor => actor ! IsMyZoneRequestFireStation(pluviometer.zoneId, pluviometerActor))
+          listings.foreach(actor => actor ! IsMyZoneRequestFromPluviometerToFireStation(pluviometer.zoneId, pluviometerActor))
           Behaviors.same
         }
         case viewService.Listing(listings) =>{

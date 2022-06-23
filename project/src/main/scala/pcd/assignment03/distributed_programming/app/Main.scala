@@ -3,7 +3,7 @@ package pcd.assignment03.distributed_programming.app
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorSystem, Behavior}
 import com.typesafe.config.{Config, ConfigFactory}
-import pcd.assignment03.distributed_programming.actors.{FireStationActor, PluviometerActor, PluviometerGuardianActor, ViewActor}
+import pcd.assignment03.distributed_programming.actors.{FireStationActor, FireStationGuardianActor, PluviometerActor, PluviometerGuardianActor, ViewActor, ViewGuardianActor}
 import pcd.assignment03.distributed_programming.model.FireStation.FireStationState.*
 import pcd.assignment03.distributed_programming.model.{Boundary, FireStation, Pluviometer, Point2D, Zone}
 import pcd.assignment03.distributed_programming.model.Zone.ZoneState.*
@@ -50,11 +50,11 @@ object Main:
     val fireStations: List[FireStation] = generateFireStations(zones)
     val pluviometers: List[Pluviometer] = generatePluviometers(zones)
     fireStations.foreach(f => {
-      startup(port = port)(FireStationActor(f, zones.iterator.next()))
+      startup(port = port)(FireStationGuardianActor(f, zones.iterator.next()))
       port = port + 1
     })
     pluviometers.foreach(p => {
-      startup(port = port)(PluviometerActor(p))
+      startup(port = port)(PluviometerGuardianActor(p))
       port = port + 1
     })
     //startup(port = 2551)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
@@ -71,7 +71,7 @@ object Main:
     //ActorSystem(FireStationActor(fireStations.iterator.next(), zones.iterator.next()), "root")
 
   @main def startNewControlPanel(): Unit =
-    startup(port = 1200)(Behaviors.setup(new ViewActor(_, 1, 800, 400)))
+    startup(port = 1200)(ViewGuardianActor(1, 800, 400))
 
   def startup[X](file: String = "cluster", port: Int)(root: => Behavior[X]): ActorSystem[X] =
     // Override the configuration of the port

@@ -87,7 +87,13 @@ sealed class CityPanel(width: Int, height: Int) extends Panel:
     val g2: Graphics2D = g
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
-    //TODO
+    g2.drawRect(0, 0, width, height)
+    g2.setColor(java.awt.Color.BLUE)
+    zones.foreach(zone => g2.drawRect(zone.bounds.x0, zone.bounds.y0, zone.bounds.width, zone.bounds.height))
+    g2.setColor(java.awt.Color.WHITE)
+    pluviometers.foreach(pluviometer => g2.drawOval(pluviometer.position.x, pluviometer.position.y, 1, 1))
+    g2.setColor(java.awt.Color.RED)
+    fireStations.foreach(fireStation => g2.fillRect(fireStation.position.x, fireStation.position.y, 1, 1))
   end paint
 
   def updatePluviometer(pluviometer: Pluviometer): Unit =

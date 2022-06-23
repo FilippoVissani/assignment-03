@@ -25,7 +25,7 @@ trait PluviometerActorCommand
 object Tick extends Message with PluviometerActorCommand
 case class RequestIsAlarm(replyTo: ActorRef[PluviometerActorCommand]) extends Message with PluviometerActorCommand
 case class IsAlarmResponse(isAlarm: IsAlarmResponseResult) extends Message with PluviometerActorCommand
-case class IsMyZoneRequestPluviometer(zoneId: Int, replyTo: ActorRef[_]) extends Message with PluviometerActorCommand
+case class IsMyZoneRequestPluviometer(zoneId: Int, replyTo: ActorRef[PluviometerActorCommand]) extends Message with PluviometerActorCommand
 case class IsMyZoneResponsePluviometer(replyTo: ActorRef[_]) extends Message with PluviometerActorCommand
 
 val pluviometerService = ServiceKey[PluviometerActorCommand]("pluviometerService")
@@ -44,17 +44,17 @@ object PluviometerActor:
         Behaviors.receiveMessage {
           case IsMyZoneRequestPluviometer(zoneId, replyTo) => {
             ctx.log.debug(s"Received IsMyZoneRequestPluviometer")
-            if pluviometer.zoneId == zoneId then replyTo match
-              case replyTo: ActorRef[PluviometerActorCommand] => replyTo ! IsMyZoneResponsePluviometer(ctx.self)
+            if pluviometer.zoneId == zoneId then
+              replyTo ! IsMyZoneResponsePluviometer(ctx.self)
             Behaviors.same
           }
-          case IsMyZoneResponsePluviometer(replyTo) => {
+          case IsMyZoneResponsePluviometer(replyTo: ActorRef[FireStationActorCommand]) => {
             ctx.log.debug(s"Received IsMyZoneResponsePluviometer")
-            replyTo match
-              case replyTo: ActorRef[FireStationActorCommand] =>
-                PluviometerActor(pluviometer, pluviometerActors, alarms, Option(replyTo))
-              case replyTo: ActorRef[PluviometerActorCommand] =>
-                PluviometerActor(pluviometer, pluviometerActors + replyTo, alarms, fireStationActor)
+            PluviometerActor(pluviometer, pluviometerActors, alarms, Option(replyTo))
+          }
+          case IsMyZoneResponsePluviometer(replyTo: ActorRef[PluviometerActorCommand]) => {
+            ctx.log.debug(s"Received IsMyZoneResponsePluviometer")
+            PluviometerActor(pluviometer, pluviometerActors + replyTo, alarms, fireStationActor)
           }
           case Tick => {
             ctx.log.debug(s"Received Tick")

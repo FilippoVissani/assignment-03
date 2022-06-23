@@ -11,7 +11,7 @@ case class UpdatePluviometer(pluviometer: Pluviometer) extends Message with View
 case class UpdateZone(fireStation: FireStation, zone: Zone) extends Message with ViewActorCommand
 object FixZone extends Message with ViewActorCommand
 object ManageZone extends Message with ViewActorCommand
-case class IsMyZoneResponseView(replyTo: ActorRef[_]) extends Message with ViewActorCommand
+case class IsMyZoneResponseView(replyTo: ActorRef[FireStationActorCommand]) extends Message with ViewActorCommand
 
 val viewService = ServiceKey[ViewActorCommand]("viewService")
 
@@ -28,7 +28,7 @@ class ViewActor(ctx: ActorContext[ViewActorCommand],
   override def onMessage(msg: ViewActorCommand): Behavior[ViewActorCommand] =
     msg match
       case UpdatePluviometer(pluviometer) => {
-        ctx.log.debug("Received PluviometerResponse")
+        ctx.log.debug("Received UpdatePluviometer")
         view.updatePluviometer(pluviometer)
       }
       case UpdateZone(fireStation, zone) => {
@@ -46,8 +46,7 @@ class ViewActor(ctx: ActorContext[ViewActorCommand],
       }
       case IsMyZoneResponseView(replyTo) => {
         ctx.log.debug("Received IsMyZoneResponseView")
-        replyTo match
-          case replyTo: ActorRef[FireStationActorCommand] => fireStationActor = Option(replyTo)
+        fireStationActor = Option(replyTo)
       }
     this
 
