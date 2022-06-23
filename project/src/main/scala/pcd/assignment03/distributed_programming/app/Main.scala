@@ -1,10 +1,13 @@
 package pcd.assignment03.distributed_programming.app
 
+import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorSystem, Behavior}
 import com.typesafe.config.{Config, ConfigFactory}
+import pcd.assignment03.distributed_programming.actors.{FireStationActor, PluviometerActor, ViewActor}
 import pcd.assignment03.distributed_programming.model.FireStation.FireStationState.*
 import pcd.assignment03.distributed_programming.model.{Boundary, FireStation, Pluviometer, Point2D, Zone}
 import pcd.assignment03.distributed_programming.model.Zone.ZoneState.*
+
 import scala.util.Random
 
 object Main:
@@ -23,8 +26,8 @@ object Main:
   def generateFireStations(zones: List[Zone]): List[FireStation] =
     var fireStations: List[FireStation] = List()
     val random: Random = Random(System.currentTimeMillis())
-    zones.foreach(x => FireStation(x.id,
-      Point2D(random.nextInt(x.bounds.width.toInt) + x.bounds.x0, random.nextInt(x.bounds.height.toInt) + x.bounds.y0),
+    zones.foreach(x => fireStations = FireStation(x.id,
+      Point2D(random.nextInt(x.bounds.width) + x.bounds.x0, random.nextInt(x.bounds.height) + x.bounds.y0),
       Free) :: fireStations)
     fireStations
 
@@ -35,24 +38,40 @@ object Main:
     var pluviometerId: Int = 0
     circularZones.foreach(x => {
       pluviometers = Pluviometer(x.id,
-        Point2D(random.nextInt(x.bounds.width.toInt) + x.bounds.x0, random.nextInt(x.bounds.height.toInt) + x.bounds.y0),
+        Point2D(random.nextInt(x.bounds.width) + x.bounds.x0, random.nextInt(x.bounds.height) + x.bounds.y0),
         15) :: pluviometers
       pluviometerId = pluviometerId + 1
     })
     pluviometers
 
   @main def main(width: Int, height: Int, rows: Int, columns: Int): Unit =
+    var port: Int = 2551
     val zones: List[Zone] = generateZones(rows, columns, Boundary(0, 0, width / (columns * rows), height / (columns * rows)))
     val fireStations: List[FireStation] = generateFireStations(zones)
     val pluviometers: List[Pluviometer] = generatePluviometers(zones)
+/*    fireStations.foreach(f => {
+      startup(port = port)(FireStationActor(f, zones.iterator.next()))
+      port = port + 1
+    })
+    pluviometers.foreach(p => {
+      startup(port = port)(PluviometerActor(p))
+      port = port + 1
+    })*/
+    //startup(port = 2551)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
+    //startup(port = 2552)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
+    //startup(port = 2553)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
+    //startup(port = 2554)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
 
-  @main def startNewZone(): Unit = ???
+    startup(port = 2551)(PluviometerActor(pluviometers.iterator.next()))
+    //startup(port = 2552)(PluviometerActor(pluviometers.iterator.next()))
+    //startup(port = 2557)(PluviometerActor(pluviometers.iterator.next()))
+    //startup(port = 2558)(PluviometerActor(pluviometers.iterator.next()))
+    //startup(port = 2559)(PluviometerActor(pluviometers.iterator.next()))
+    //startup(port = 2560)(PluviometerActor(pluviometers.iterator.next()))
+    //ActorSystem(FireStationActor(fireStations.iterator.next(), zones.iterator.next()), "root")
 
-  @main def startNewFireStation(): Unit = ???
-
-  @main def startNewPluviometer(): Unit = ???
-
-  @main def startNewControlPanel(): Unit = ???
+  @main def startNewControlPanel(): Unit =
+    startup(port = 1200)(Behaviors.setup(new ViewActor(_, 1, 800, 400)))
 
   def startup[X](file: String = "cluster", port: Int)(root: => Behavior[X]): ActorSystem[X] =
     // Override the configuration of the port

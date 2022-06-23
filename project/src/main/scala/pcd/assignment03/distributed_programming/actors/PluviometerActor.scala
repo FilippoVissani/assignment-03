@@ -33,9 +33,9 @@ val pluviometerService = ServiceKey[PluviometerActorCommand]("pluviometerService
 object PluviometerActor:
 
   def apply(pluviometer: Pluviometer,
-            pluviometerActors: Set[ActorRef[PluviometerActorCommand]],
-            alarms: List[IsAlarmResponseResult],
-            fireStationActor: Option[ActorRef[FireStationActorCommand]]): Behavior[PluviometerActorCommand | Receptionist.Listing] =
+            pluviometerActors: Set[ActorRef[PluviometerActorCommand]] = Set(),
+            alarms: List[IsAlarmResponseResult] = List(),
+            fireStationActor: Option[ActorRef[FireStationActorCommand]] = Option.empty): Behavior[PluviometerActorCommand | Receptionist.Listing] =
     Behaviors.setup[PluviometerActorCommand | Receptionist.Listing] { ctx =>
       implicit val timeout: Timeout = 1.seconds
       ctx.system.receptionist ! Receptionist.register(pluviometerService, ctx.self)
@@ -46,6 +46,7 @@ object PluviometerActor:
         timers.startTimerAtFixedRate(Tick, 5.seconds)
         Behaviors.receiveMessage {
           case msg: Receptionist.Listing => {
+            ctx.log.debug(s"Received Receptionist.Listing")
             msg
               .serviceInstances(pluviometerService)
               .foreach(actor => actor ! IsMyZoneRequestPluviometer(pluviometer.zoneId, ctx.self).asInstanceOf[PluviometerActorCommand])
@@ -58,11 +59,13 @@ object PluviometerActor:
             Behaviors.same
           }
           case IsMyZoneRequestPluviometer(zoneId, replyTo) => {
+            ctx.log.debug(s"Received IsMyZoneRequestPluviometer")
             if pluviometer.zoneId == zoneId then replyTo match
               case replyTo: ActorRef[PluviometerActorCommand] => replyTo ! IsMyZoneResponsePluviometer(ctx.self)
             Behaviors.same
           }
           case IsMyZoneResponsePluviometer(replyTo) => {
+            ctx.log.debug(s"Received IsMyZoneResponsePluviometer")
             replyTo match
               case replyTo: ActorRef[FireStationActorCommand] =>
                 PluviometerActor(pluviometer, pluviometerActors, alarms, Option(replyTo))
@@ -70,6 +73,7 @@ object PluviometerActor:
                 PluviometerActor(pluviometer, pluviometerActors + replyTo, alarms, fireStationActor)
           }
           case Tick => {
+            ctx.log.debug(s"Received Tick")
             pluviometerActors.foreach (actor => {
               ctx.ask(actor, RequestIsAlarm.apply){
                 case Success(IsAlarmResponse(isAlarm)) => IsAlarmResponse(isAlarm)
@@ -79,6 +83,7 @@ object PluviometerActor:
             PluviometerActor(pluviometer, pluviometerActors, List(), fireStationActor)
           }
           case RequestIsAlarm(replyTo) => {
+            ctx.log.debug(s"Received RequestIsAlarm")
             if ThreadLocalRandom.current().nextFloat(20) > pluviometer.threshold then
               replyTo ! IsAlarmResponse(Alarm)
             else
@@ -86,6 +91,7 @@ object PluviometerActor:
             Behaviors.same
           }
           case IsAlarmResponse(isAlarm) => {
+            ctx.log.debug(s"Received IsAlarmResponse")
             if alarms.size == pluviometerActors.size - 1 then
               if alarms.count(isAlarm => isAlarm == Alarm) > alarms.size / 2 && fireStationActor.isDefined then
                 fireStationActor.get ! WarnFireStation

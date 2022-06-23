@@ -9,6 +9,7 @@ lazy val akkaGroup = "com.typesafe.akka"
 libraryDependencies ++= Seq(
   akkaGroup %% "akka-actor-typed" % akkaVersion,
   akkaGroup %% "akka-cluster-typed" % akkaVersion,
+  "com.typesafe.akka" %% "akka-serialization-jackson" % akkaVersion,
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   akkaGroup %% "akka-actor-testkit-typed" % akkaVersion % Test,
   "org.scalatest" %% "scalatest" % "3.2.11" % Test,

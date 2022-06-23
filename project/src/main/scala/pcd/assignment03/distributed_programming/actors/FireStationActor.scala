@@ -18,34 +18,43 @@ val fireStationService = ServiceKey[FireStationActorCommand]("fireStationService
 object FireStationActor:
   def apply(fireStation: FireStation,
             zone: Zone,
-            viewActors: Set[ActorRef[ViewActorCommand]]): Behavior[FireStationActorCommand | Receptionist.Listing] =
+            viewActors: Set[ActorRef[ViewActorCommand]] = Set()): Behavior[FireStationActorCommand | Receptionist.Listing] =
     viewActors.foreach(viewActor => viewActor ! UpdateZone(fireStation, zone))
     Behaviors.setup[FireStationActorCommand | Receptionist.Listing] { ctx =>
-      ctx.system.receptionist ! Receptionist.register(fireStationService, ctx.self)
+      ctx.system.receptionist ! Receptionist.Register(fireStationService, ctx.self)
       ctx.system.receptionist ! Receptionist.Subscribe(viewService, ctx.self)
       Behaviors.receiveMessage {
         case msg: Receptionist.Listing => {
-          FireStationActor(fireStation, zone, msg.serviceInstances(viewService))
+          ctx.log.debug("Received Receptionist.Listing")
+          //TODO FireStationActor(fireStation, zone, msg.serviceInstances(viewService))
+          Behaviors.same //TODO
         }
         case WarnFireStation => {
           ctx.log.debug("Received WarnFireStation")
-          if fireStation.state == Free then FireStationActor(fireStation.state_(Warned), zone.state_(ZoneState.Alarm), viewActors)
-          else Behaviors.same
+          //TODO if fireStation.state == Free then FireStationActor(fireStation.state_(Warned), zone.state_(ZoneState.Alarm), viewActors)
+          //else Behaviors.same
+          Behaviors.same //TODO
         }
         case FreeFireStation => {
           ctx.log.debug("Received FreeFireStation")
-          FireStationActor(fireStation.state_(Free), zone.state_(ZoneState.Ok), viewActors)
+          //TODO FireStationActor(fireStation.state_(Free), zone.state_(ZoneState.Ok), viewActors)
+          Behaviors.same //TODO
         }
         case BusyFireStation => {
           ctx.log.debug("Received BusyFireStation")
-          FireStationActor(fireStation.state_(Busy), zone.state_(ZoneState.UnderManagement), viewActors)
+          //TODO FireStationActor(fireStation.state_(Busy), zone.state_(ZoneState.UnderManagement), viewActors)
+          Behaviors.same //TODO
         }
         case IsMyZoneRequestFireStation(zoneId, replyTo) => {
-          if fireStation.zoneId == zoneId then replyTo match
+          ctx.log.debug("Received IsMyZoneRequestFireStation")
+          /*TODOif fireStation.zoneId == zoneId then replyTo match
             case replyTo: ActorRef[PluviometerActorCommand] => replyTo ! IsMyZoneResponsePluviometer(ctx.self)
-            case replyTo: ActorRef[ViewActorCommand] => replyTo ! IsMyZoneResponseView(ctx.self)
+            case replyTo: ActorRef[ViewActorCommand] => replyTo ! IsMyZoneResponseView(ctx.self)*/
           Behaviors.same
         }
-        case _ => Behaviors.stopped
+        case _ => {
+          //TODO Behaviors.stopped
+          Behaviors.same //TODO
+        }
       }
     }

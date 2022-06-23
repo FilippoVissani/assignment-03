@@ -29,25 +29,28 @@ class ViewActor(ctx: ActorContext[ViewActorCommand | Receptionist.Listing],
   override def onMessage(msg: ViewActorCommand | Receptionist.Listing): Behavior[ViewActorCommand | Receptionist.Listing] =
     msg match
       case msg: Receptionist.Listing => {
+        ctx.log.debug("Received Receptionist.Listing")
         msg.serviceInstances(fireStationService).foreach(actor => actor ! IsMyZoneRequestFireStation(zoneId, ctx.self))
       }
       case UpdatePluviometer(pluviometer) => {
-        ctx.log.debug("ViewActor Received PluviometerResponse")
+        ctx.log.debug("Received PluviometerResponse")
         view.updatePluviometer(pluviometer)
       }
       case UpdateZone(fireStation, zone) => {
+        ctx.log.debug("Received UpdateZone")
         view.updateZone(zone)
         view.updateFireStation(fireStation)
       }
       case FixZone => {
-        ctx.log.debug("ViewActor Received FixZone")
+        ctx.log.debug("Received FixZone")
         if fireStationActor.isDefined then fireStationActor.get ! FreeFireStation
       }
       case ManageZone => {
-        ctx.log.debug("ViewActor Received ManageZone")
+        ctx.log.debug("Received ManageZone")
         if fireStationActor.isDefined then fireStationActor.get ! BusyFireStation
       }
       case IsMyZoneResponseView(replyTo) => {
+        ctx.log.debug("Received IsMyZoneResponseView")
         replyTo match
           case replyTo: ActorRef[FireStationActorCommand] => fireStationActor = Option(replyTo)
       }
