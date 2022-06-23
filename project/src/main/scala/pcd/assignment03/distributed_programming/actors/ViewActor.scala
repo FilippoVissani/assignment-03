@@ -15,7 +15,7 @@ case class IsMyZoneResponseView(replyTo: ActorRef[_]) extends Message with ViewA
 
 val viewService = ServiceKey[ViewActorCommand]("viewService")
 
-class ViewActor(ctx: ActorContext[ViewActorCommand | Receptionist.Listing],
+class ViewActor(ctx: ActorContext[ViewActorCommand],
                 zoneId: Int,
                 width: Int,
                 height: Int) extends AbstractBehavior(ctx):
@@ -24,14 +24,9 @@ class ViewActor(ctx: ActorContext[ViewActorCommand | Receptionist.Listing],
   var fireStationActor: Option[ActorRef[FireStationActorCommand]] = Option.empty
 
   ctx.system.receptionist ! Receptionist.register(viewService, ctx.self)
-  ctx.system.receptionist ! Receptionist.subscribe(fireStationService, ctx.self)
 
-  override def onMessage(msg: ViewActorCommand | Receptionist.Listing): Behavior[ViewActorCommand | Receptionist.Listing] =
+  override def onMessage(msg: ViewActorCommand): Behavior[ViewActorCommand] =
     msg match
-      case msg: Receptionist.Listing => {
-        ctx.log.debug("Received Receptionist.Listing")
-        msg.serviceInstances(fireStationService).foreach(actor => actor ! IsMyZoneRequestFireStation(zoneId, ctx.self))
-      }
       case UpdatePluviometer(pluviometer) => {
         ctx.log.debug("Received PluviometerResponse")
         view.updatePluviometer(pluviometer)

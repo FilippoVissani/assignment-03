@@ -3,7 +3,7 @@ package pcd.assignment03.distributed_programming.app
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorSystem, Behavior}
 import com.typesafe.config.{Config, ConfigFactory}
-import pcd.assignment03.distributed_programming.actors.{FireStationActor, PluviometerActor, ViewActor}
+import pcd.assignment03.distributed_programming.actors.{FireStationActor, PluviometerActor, PluviometerGuardianActor, ViewActor}
 import pcd.assignment03.distributed_programming.model.FireStation.FireStationState.*
 import pcd.assignment03.distributed_programming.model.{Boundary, FireStation, Pluviometer, Point2D, Zone}
 import pcd.assignment03.distributed_programming.model.Zone.ZoneState.*
@@ -49,21 +49,21 @@ object Main:
     val zones: List[Zone] = generateZones(rows, columns, Boundary(0, 0, width / (columns * rows), height / (columns * rows)))
     val fireStations: List[FireStation] = generateFireStations(zones)
     val pluviometers: List[Pluviometer] = generatePluviometers(zones)
-/*    fireStations.foreach(f => {
+    fireStations.foreach(f => {
       startup(port = port)(FireStationActor(f, zones.iterator.next()))
       port = port + 1
     })
     pluviometers.foreach(p => {
       startup(port = port)(PluviometerActor(p))
       port = port + 1
-    })*/
+    })
     //startup(port = 2551)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
     //startup(port = 2552)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
     //startup(port = 2553)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
     //startup(port = 2554)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
 
-    startup(port = 2551)(PluviometerActor(pluviometers.iterator.next()))
-    //startup(port = 2552)(PluviometerActor(pluviometers.iterator.next()))
+    //startup(port = 2555)(PluviometerGuardianActor(pluviometers.iterator.next()))
+    //startup(port = 2556)(PluviometerGuardianActor(pluviometers.iterator.next()))
     //startup(port = 2557)(PluviometerActor(pluviometers.iterator.next()))
     //startup(port = 2558)(PluviometerActor(pluviometers.iterator.next()))
     //startup(port = 2559)(PluviometerActor(pluviometers.iterator.next()))

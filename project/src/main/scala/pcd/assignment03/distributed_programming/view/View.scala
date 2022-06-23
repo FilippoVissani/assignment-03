@@ -16,7 +16,7 @@ trait View:
   def fixZonePressed(): Unit
 
 object View:
-  def apply(width: Int, height: Int, zoneId: Int, viewActor: ActorRef[ViewActorCommand | Receptionist.Listing]): View =
+  def apply(width: Int, height: Int, zoneId: Int, viewActor: ActorRef[ViewActorCommand]): View =
     ViewImpl(width, height, zoneId, viewActor)
 
   /**
@@ -25,7 +25,7 @@ object View:
   private class ViewImpl(override val width: Int,
                          override val height: Int,
                          override val zoneId: Int,
-                         val viewActor: ActorRef[ViewActorCommand | Receptionist.Listing]) extends View:
+                         val viewActor: ActorRef[ViewActorCommand]) extends View:
     val frame: SwingControlPanel = SwingControlPanel(this)
 
     override def updateZone(zone: Zone): Unit =

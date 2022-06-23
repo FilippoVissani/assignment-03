@@ -35,29 +35,13 @@ object PluviometerActor:
   def apply(pluviometer: Pluviometer,
             pluviometerActors: Set[ActorRef[PluviometerActorCommand]] = Set(),
             alarms: List[IsAlarmResponseResult] = List(),
-            fireStationActor: Option[ActorRef[FireStationActorCommand]] = Option.empty): Behavior[PluviometerActorCommand | Receptionist.Listing] =
-    Behaviors.setup[PluviometerActorCommand | Receptionist.Listing] { ctx =>
+            fireStationActor: Option[ActorRef[FireStationActorCommand]] = Option.empty): Behavior[PluviometerActorCommand] =
+    Behaviors.setup[PluviometerActorCommand] { ctx =>
       implicit val timeout: Timeout = 1.seconds
       ctx.system.receptionist ! Receptionist.register(pluviometerService, ctx.self)
-      ctx.system.receptionist ! Receptionist.Subscribe(pluviometerService, ctx.self)
-      ctx.system.receptionist ! Receptionist.Subscribe(fireStationService, ctx.self)
-      ctx.system.receptionist ! Receptionist.Subscribe(viewService, ctx.self)
       Behaviors.withTimers { timers =>
         timers.startTimerAtFixedRate(Tick, 5.seconds)
         Behaviors.receiveMessage {
-          case msg: Receptionist.Listing => {
-            ctx.log.debug(s"Received Receptionist.Listing")
-            msg
-              .serviceInstances(pluviometerService)
-              .foreach(actor => actor ! IsMyZoneRequestPluviometer(pluviometer.zoneId, ctx.self).asInstanceOf[PluviometerActorCommand])
-            msg
-              .serviceInstances(fireStationService)
-              .foreach(actor => actor ! IsMyZoneRequestFireStation(pluviometer.zoneId, ctx.self).asInstanceOf[FireStationActorCommand])
-            msg
-              .serviceInstances(viewService)
-              .foreach(actor => actor ! UpdatePluviometer(pluviometer))
-            Behaviors.same
-          }
           case IsMyZoneRequestPluviometer(zoneId, replyTo) => {
             ctx.log.debug(s"Received IsMyZoneRequestPluviometer")
             if pluviometer.zoneId == zoneId then replyTo match

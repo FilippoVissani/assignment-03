@@ -12,21 +12,21 @@ object WarnFireStation extends Message with FireStationActorCommand
 object FreeFireStation extends Message with FireStationActorCommand
 object BusyFireStation extends Message with FireStationActorCommand
 case class IsMyZoneRequestFireStation(zoneId: Int, replyTo: ActorRef[_]) extends Message with FireStationActorCommand
+case class SetViews(views: Set[ActorRef[ViewActorCommand]]) extends Message with FireStationActorCommand
 
 val fireStationService = ServiceKey[FireStationActorCommand]("fireStationService")
 
 object FireStationActor:
   def apply(fireStation: FireStation,
             zone: Zone,
-            viewActors: Set[ActorRef[ViewActorCommand]] = Set()): Behavior[FireStationActorCommand | Receptionist.Listing] =
+            viewActors: Set[ActorRef[ViewActorCommand]] = Set()): Behavior[FireStationActorCommand] =
     viewActors.foreach(viewActor => viewActor ! UpdateZone(fireStation, zone))
-    Behaviors.setup[FireStationActorCommand | Receptionist.Listing] { ctx =>
+    Behaviors.setup[FireStationActorCommand] { ctx =>
       ctx.system.receptionist ! Receptionist.Register(fireStationService, ctx.self)
-      ctx.system.receptionist ! Receptionist.Subscribe(viewService, ctx.self)
       Behaviors.receiveMessage {
-        case msg: Receptionist.Listing => {
-          ctx.log.debug("Received Receptionist.Listing")
-          FireStationActor(fireStation, zone, msg.serviceInstances(viewService))
+        case SetViews(views) => {
+          ctx.log.debug("Received SetViews")
+          FireStationActor(fireStation, zone, views)
         }
         case WarnFireStation => {
           ctx.log.debug("Received WarnFireStation")
