@@ -3,7 +3,6 @@ package pcd.assignment03.distributed_programming.view
 import com.sun.java.accessibility.util.AWTEventMonitor.addWindowListener
 import pcd.assignment03.distributed_programming.model.ZoneState.*
 import pcd.assignment03.distributed_programming.model.{FireStation, Pluviometer, Zone}
-
 import java.awt.event.{WindowAdapter, WindowEvent}
 import java.awt.{Dimension, Graphics2D, RenderingHints}
 import javax.swing.{BorderFactory, SwingUtilities}
@@ -20,12 +19,13 @@ object SwingControlPanel:
   def apply(view: View): SwingControlPanel = SwingControlPanelImpl(view)
 
   private class SwingControlPanelImpl(view: View) extends Frame with SwingControlPanel:
+    val buttonsPanel: ButtonsPanel = ButtonsPanel(view)
     val cityPanel: CityPanel = CityPanel(view.width, view.height)
 
     title = "Control Panel"
     resizable = false
     contents = new BorderPanel{
-      layout(ButtonsPanel(view)) = North
+      layout(buttonsPanel) = North
       layout(cityPanel) = Center
     }
     visible = true
@@ -39,20 +39,22 @@ object SwingControlPanel:
     })
 
     override def updateFirestation(fireStation: FireStation): Unit =
-      SwingUtilities.invokeLater(() => {
+      SwingUtilities.invokeAndWait(() => {
         cityPanel.updateFireStation(fireStation)
         repaint()
       })
 
     override def updatePluviometer(pluviometer: Pluviometer): Unit =
-      SwingUtilities.invokeLater(() => {
+      SwingUtilities.invokeAndWait(() => {
         cityPanel.updatePluviometer(pluviometer)
         repaint()
       })
 
     override def updateZone(zone: Zone): Unit =
-      SwingUtilities.invokeLater(() => {
+      SwingUtilities.invokeAndWait(() => {
         cityPanel.updateZone(zone)
+        if view.zoneId == zone.id && zone.state == Alarm then
+          buttonsPanel.buttonManage.enabled = true
         repaint()
       })
 
@@ -66,21 +68,22 @@ sealed class ButtonsPanel(view: View) extends FlowPanel:
     action = new Action("Manage Zone"):
       override def apply(): Unit =
         buttonFix.enabled = true
+        this.enabled = false
         view.manageZonePressed()
   }
   val buttonFix: Button = new Button{
     text = "Fix Zone"
     enabled = false
     action = new Action("Fix Zone"):
-      buttonManage.enabled = false
-      enabled = false
       override def apply(): Unit =
+        this.enabled = false
         view.fixZonePressed()
   }
   val zoneIdLabel: Label = Label(s"Zone ${view.zoneId}")
   contents += zoneIdLabel
   contents += buttonManage
   contents += buttonFix
+
 end ButtonsPanel
 
 sealed class CityPanel(width: Int, height: Int) extends Panel:
