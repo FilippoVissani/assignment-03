@@ -7,11 +7,11 @@ import pcd.assignment03.distributed_programming.model.{FireStation, Pluviometer,
 import pcd.assignment03.distributed_programming.view.View
 
 trait ViewActorCommand
-case class UpdatePluviometer(pluviometer: Pluviometer) extends Message with ViewActorCommand
-case class UpdateZone(fireStation: FireStation, zone: Zone) extends Message with ViewActorCommand
-object FixZone extends Message with ViewActorCommand
-object ManageZone extends Message with ViewActorCommand
-case class IsMyZoneResponseView(replyTo: ActorRef[FireStationActorCommand]) extends Message with ViewActorCommand
+case class UpdatePluviometer(pluviometer: Pluviometer) extends Serializable with ViewActorCommand
+case class UpdateZone(fireStation: FireStation, zone: Zone) extends Serializable with ViewActorCommand
+object FixZone extends Serializable with ViewActorCommand
+object ManageZone extends Serializable with ViewActorCommand
+case class IsMyZoneResponseView(replyTo: ActorRef[FireStationActorCommand]) extends Serializable with ViewActorCommand
 
 val viewService = ServiceKey[ViewActorCommand]("viewService")
 

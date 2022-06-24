@@ -4,9 +4,9 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorSystem, Behavior}
 import com.typesafe.config.{Config, ConfigFactory}
 import pcd.assignment03.distributed_programming.actors.{FireStationActor, FireStationGuardianActor, PluviometerActor, PluviometerGuardianActor, ViewActor, ViewGuardianActor}
-import pcd.assignment03.distributed_programming.model.FireStation.FireStationState.*
 import pcd.assignment03.distributed_programming.model.{Boundary, FireStation, Pluviometer, Point2D, Zone}
-import pcd.assignment03.distributed_programming.model.Zone.ZoneState.*
+import pcd.assignment03.distributed_programming.model.ZoneState.*
+import pcd.assignment03.distributed_programming.model.FireStationState.*
 
 import scala.util.Random
 
@@ -57,6 +57,7 @@ object Main:
       startup(port = port)(PluviometerGuardianActor(p))
       port = port + 1
     })
+    startup(port = 1200)(ViewGuardianActor(1, 800, 400))
     //startup(port = 2551)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
     //startup(port = 2552)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
     //startup(port = 2553)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))

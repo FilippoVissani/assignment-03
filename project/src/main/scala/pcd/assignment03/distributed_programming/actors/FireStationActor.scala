@@ -3,17 +3,16 @@ package pcd.assignment03.distributed_programming.actors
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.Behaviors
-import pcd.assignment03.distributed_programming.model.{FireStation, Zone}
-import pcd.assignment03.distributed_programming.model.FireStation.FireStationState.*
-import pcd.assignment03.distributed_programming.model.Zone.ZoneState
+import pcd.assignment03.distributed_programming.model.{FireStation, Zone, ZoneState}
+import pcd.assignment03.distributed_programming.model.FireStationState.*
 
 trait FireStationActorCommand
-object WarnFireStation extends Message with FireStationActorCommand
-object FreeFireStation extends Message with FireStationActorCommand
-object BusyFireStation extends Message with FireStationActorCommand
-case class IsMyZoneRequestFromViewToFireStation(zoneId: Int, replyTo: ActorRef[ViewActorCommand]) extends Message with FireStationActorCommand
-case class IsMyZoneRequestFromPluviometerToFireStation(zoneId: Int, replyTo: ActorRef[PluviometerActorCommand]) extends Message with FireStationActorCommand
-case class SetViews(views: Set[ActorRef[ViewActorCommand]]) extends Message with FireStationActorCommand
+object WarnFireStation extends Serializable with FireStationActorCommand
+object FreeFireStation extends Serializable with FireStationActorCommand
+object BusyFireStation extends Serializable with FireStationActorCommand
+case class IsMyZoneRequestFromViewToFireStation(zoneId: Int, replyTo: ActorRef[ViewActorCommand]) extends Serializable with FireStationActorCommand
+case class IsMyZoneRequestFromPluviometerToFireStation(zoneId: Int, replyTo: ActorRef[PluviometerActorCommand]) extends Serializable with FireStationActorCommand
+case class SetViews(views: Set[ActorRef[ViewActorCommand]]) extends Serializable with FireStationActorCommand
 
 val fireStationService = ServiceKey[FireStationActorCommand]("fireStationService")
 
@@ -53,7 +52,7 @@ object FireStationActor:
         case IsMyZoneRequestFromPluviometerToFireStation(zoneId, replyTo) => {
           ctx.log.debug("Received IsMyZoneRequestFireStation")
           if fireStation.zoneId == zoneId then
-            replyTo ! IsMyZoneResponsePluviometer(ctx.self)
+            replyTo ! IsMyZoneResponseFromFireStationToPluviometer(ctx.self)
           Behaviors.same
         }
         case _ => {

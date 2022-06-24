@@ -1,6 +1,7 @@
 package pcd.assignment03.distributed_programming.actors
 
 import akka.actor
+
 import scala.util.{Failure, Success}
 import akka.pattern.ask
 import akka.actor.{AbstractActorWithTimers, Actor, Timers}
@@ -9,24 +10,26 @@ import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors, TimerScheduler}
 import akka.util.Timeout
+import pcd.assignment03.distributed_programming.actors.IsAlarmResponseResult.*
 import pcd.assignment03.distributed_programming.model.Pluviometer
+
 import java.util.concurrent.ThreadLocalRandom
 import concurrent.duration.DurationInt
 import scala.concurrent.Future
 
-enum IsAlarmResponseResult:
-  case Alarm
-  case NotAlarm
-  case Unreachable
+object IsAlarmResponseResult extends Enumeration:
+  type IsAlarmResponseResult = Value
+  val Alarm, NotAlarm, Unreachable = Value
 
-export IsAlarmResponseResult.*
 
 trait PluviometerActorCommand
-object Tick extends Message with PluviometerActorCommand
-case class RequestIsAlarm(replyTo: ActorRef[PluviometerActorCommand]) extends Message with PluviometerActorCommand
-case class IsAlarmResponse(isAlarm: IsAlarmResponseResult) extends Message with PluviometerActorCommand
-case class IsMyZoneRequestPluviometer(zoneId: Int, replyTo: ActorRef[PluviometerActorCommand]) extends Message with PluviometerActorCommand
-case class IsMyZoneResponsePluviometer(replyTo: ActorRef[_]) extends Message with PluviometerActorCommand
+object Tick extends Serializable with PluviometerActorCommand
+case class RequestIsAlarm(replyTo: ActorRef[PluviometerActorCommand]) extends Serializable with PluviometerActorCommand
+case class IsAlarmResponse(isAlarm: IsAlarmResponseResult) extends Serializable with PluviometerActorCommand
+case class IsMyZoneRequestPluviometer(zoneId: Int, replyTo: ActorRef[PluviometerActorCommand]) extends Serializable with PluviometerActorCommand
+case class IsMyZoneResponseFromFireStationToPluviometer(replyTo: ActorRef[FireStationActorCommand]) extends Serializable with PluviometerActorCommand
+case class IsMyZoneResponseFromPluviometerToPluviometer(replyTo: ActorRef[PluviometerActorCommand]) extends Serializable with PluviometerActorCommand
+
 
 val pluviometerService = ServiceKey[PluviometerActorCommand]("pluviometerService")
 
@@ -45,15 +48,15 @@ object PluviometerActor:
           case IsMyZoneRequestPluviometer(zoneId, replyTo) => {
             ctx.log.debug(s"Received IsMyZoneRequestPluviometer")
             if pluviometer.zoneId == zoneId then
-              replyTo ! IsMyZoneResponsePluviometer(ctx.self)
+              replyTo ! IsMyZoneResponseFromPluviometerToPluviometer(ctx.self)
             Behaviors.same
           }
-          case IsMyZoneResponsePluviometer(replyTo: ActorRef[FireStationActorCommand]) => {
-            ctx.log.debug(s"Received IsMyZoneResponsePluviometer")
+          case IsMyZoneResponseFromFireStationToPluviometer(replyTo) => {
+            ctx.log.debug(s"Received IsMyZoneResponseFromFireStationToPluviometer")
             PluviometerActor(pluviometer, pluviometerActors, alarms, Option(replyTo))
           }
-          case IsMyZoneResponsePluviometer(replyTo: ActorRef[PluviometerActorCommand]) => {
-            ctx.log.debug(s"Received IsMyZoneResponsePluviometer")
+          case IsMyZoneResponseFromPluviometerToPluviometer(replyTo) => {
+            ctx.log.debug(s"Received IsMyZoneResponseFromPluviometerToPluviometer")
             PluviometerActor(pluviometer, pluviometerActors + replyTo, alarms, fireStationActor)
           }
           case Tick => {
