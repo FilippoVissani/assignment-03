@@ -98,10 +98,10 @@ sealed class CityPanel(width: Int, height: Int) extends Panel:
       g2.fillRect(zone.bounds.x0, zone.bounds.y0, zone.bounds.width, zone.bounds.height)
       g2.setColor(java.awt.Color.BLACK)
       g2.drawString(zone.state.toString, zone.bounds.x0 + 5, zone.bounds.y0 + 15)
+      g2.drawRect(zone.bounds.x0, zone.bounds.y0, zone.bounds.width, zone.bounds.height)
     })
     g2.setColor(java.awt.Color.BLACK)
     pluviometers.foreach(pluviometer => g2.fillOval(pluviometer.position.x, pluviometer.position.y, 10, 10))
-    g2.setColor(java.awt.Color.BLACK)
     fireStations.foreach(fireStation => {
       g2.fillRect(fireStation.position.x, fireStation.position.y, 10, 10)
       g2.drawString(fireStation.state.toString, fireStation.position.x, fireStation.position.y + 20)
