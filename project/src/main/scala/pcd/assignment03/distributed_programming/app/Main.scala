@@ -15,10 +15,10 @@ object Main:
   def generateZones(rows: Int, columns: Int, zoneSize: Boundary): List[Zone] =
     var zones: List[Zone] = List()
     var k: Int = 0
-    for i <- 0 until rows do
-      for j <- 0 until columns do
+    for i <- 0 until columns do
+      for j <- 0 until rows do
         zones = Zone(k,
-          Boundary(i * zoneSize.width, j * zoneSize.height, (i * zoneSize.width + zoneSize.width) - 1, (j * zoneSize.height + zoneSize.height) - 1),
+          Boundary(i * zoneSize.width, j * zoneSize.height, (i * zoneSize.width) + zoneSize.width - 1, (j * zoneSize.height) + zoneSize.height - 1),
           Ok) :: zones
         k = k + 1
     zones
@@ -46,7 +46,7 @@ object Main:
 
   @main def main(width: Int, height: Int, rows: Int, columns: Int): Unit =
     var port: Int = 2551
-    val zones: List[Zone] = generateZones(rows, columns, Boundary(0, 0, width / (columns * rows), height / (columns * rows)))
+    val zones: List[Zone] = generateZones(rows, columns, Boundary(0, 0, width / columns, height / rows))
     val fireStations: List[FireStation] = generateFireStations(zones)
     val pluviometers: List[Pluviometer] = generatePluviometers(zones)
     fireStations.foreach(f => {
@@ -57,7 +57,7 @@ object Main:
       startup(port = port)(PluviometerGuardianActor(p))
       port = port + 1
     })
-    startup(port = 1200)(ViewGuardianActor(1, 800, 400))
+    startup(port = 1200)(ViewGuardianActor(1, width, height))
     //startup(port = 2551)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
     //startup(port = 2552)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
     //startup(port = 2553)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))

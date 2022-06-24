@@ -1,11 +1,12 @@
 package pcd.assignment03.distributed_programming.view
 
 import com.sun.java.accessibility.util.AWTEventMonitor.addWindowListener
+import pcd.assignment03.distributed_programming.model.ZoneState.*
 import pcd.assignment03.distributed_programming.model.{FireStation, Pluviometer, Zone}
 
 import java.awt.event.{WindowAdapter, WindowEvent}
 import java.awt.{Dimension, Graphics2D, RenderingHints}
-import javax.swing.SwingUtilities
+import javax.swing.{BorderFactory, SwingUtilities}
 import scala.swing.BorderPanel.Position.{Center, North}
 import scala.swing.{Action, BorderPanel, Button, FlowPanel, Frame, Panel}
 
@@ -22,7 +23,7 @@ object SwingControlPanel:
     val cityPanel: CityPanel = CityPanel(view.width, view.height)
 
     title = "Control Panel"
-    size = Dimension(view.width, view.height)
+    //size = Dimension(view.width, view.height)
     resizable = false
     contents = new BorderPanel{
       layout(ButtonsPanel(view, cityPanel)) = North
@@ -87,13 +88,24 @@ sealed class CityPanel(width: Int, height: Int) extends Panel:
     val g2: Graphics2D = g
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
-    g2.drawRect(0, 0, width, height)
+    g2.drawRect(0, 0, width - 1, height - 1)
     g2.setColor(java.awt.Color.BLUE)
-    zones.foreach(zone => g2.drawRect(zone.bounds.x0, zone.bounds.y0, zone.bounds.width, zone.bounds.height))
-    g2.setColor(java.awt.Color.WHITE)
-    pluviometers.foreach(pluviometer => g2.drawOval(pluviometer.position.x, pluviometer.position.y, 1, 1))
-    g2.setColor(java.awt.Color.RED)
-    fireStations.foreach(fireStation => g2.fillRect(fireStation.position.x, fireStation.position.y, 1, 1))
+    zones.foreach(zone => {
+      zone match
+        case Zone(_, _, Ok) => g2.setColor(java.awt.Color.GREEN)
+        case Zone(_, _, UnderManagement) => g2.setColor(java.awt.Color.YELLOW)
+        case Zone(_, _, Alarm) => g2.setColor(java.awt.Color.RED)
+      g2.fillRect(zone.bounds.x0, zone.bounds.y0, zone.bounds.width, zone.bounds.height)
+      g2.setColor(java.awt.Color.BLACK)
+      g2.drawString(zone.state.toString, zone.bounds.x0 + 5, zone.bounds.y0 + 15)
+    })
+    g2.setColor(java.awt.Color.BLACK)
+    pluviometers.foreach(pluviometer => g2.fillOval(pluviometer.position.x, pluviometer.position.y, 10, 10))
+    g2.setColor(java.awt.Color.BLACK)
+    fireStations.foreach(fireStation => {
+      g2.fillRect(fireStation.position.x, fireStation.position.y, 10, 10)
+      g2.drawString(fireStation.state.toString, fireStation.position.x, fireStation.position.y + 20)
+    })
   end paint
 
   def updatePluviometer(pluviometer: Pluviometer): Unit =
