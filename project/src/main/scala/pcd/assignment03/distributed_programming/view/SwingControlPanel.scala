@@ -97,7 +97,7 @@ sealed class CityPanel(width: Int, height: Int) extends Panel:
         case Zone(_, _, Alarm) => g2.setColor(java.awt.Color.RED)
       g2.fillRect(zone.bounds.x0, zone.bounds.y0, zone.bounds.width, zone.bounds.height)
       g2.setColor(java.awt.Color.BLACK)
-      g2.drawString(zone.state.toString, zone.bounds.x0 + 5, zone.bounds.y0 + 15)
+      g2.drawString(s"ZONE ${zone.id}: ${zone.state.toString}", zone.bounds.x0 + 5, zone.bounds.y0 + 15)
       g2.drawRect(zone.bounds.x0, zone.bounds.y0, zone.bounds.width, zone.bounds.height)
     })
     g2.setColor(java.awt.Color.BLACK)

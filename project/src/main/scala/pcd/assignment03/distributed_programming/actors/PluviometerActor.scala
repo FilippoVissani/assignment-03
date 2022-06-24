@@ -40,7 +40,7 @@ object PluviometerActor:
             alarms: List[IsAlarmResponseResult] = List(),
             fireStationActor: Option[ActorRef[FireStationActorCommand]] = Option.empty): Behavior[PluviometerActorCommand] =
     Behaviors.setup[PluviometerActorCommand] { ctx =>
-      implicit val timeout: Timeout = 1.seconds
+      implicit val timeout: Timeout = 2.seconds
       ctx.system.receptionist ! Receptionist.register(pluviometerService, ctx.self)
       Behaviors.withTimers { timers =>
         timers.startTimerAtFixedRate(Tick, 5.seconds)
@@ -79,12 +79,13 @@ object PluviometerActor:
           }
           case IsAlarmResponse(isAlarm) => {
             ctx.log.debug(s"Received IsAlarmResponse")
-            if alarms.size == pluviometerActors.size - 1 then
-              if alarms.count(isAlarm => isAlarm == Alarm) > alarms.size / 2 && fireStationActor.isDefined then
+            val tmpAlarms = isAlarm :: alarms
+            if tmpAlarms.size == pluviometerActors.size then
+              if tmpAlarms.count(state => state == Alarm) > tmpAlarms.size / 2 && fireStationActor.isDefined then
                 fireStationActor.get ! WarnFireStation
               Behaviors.same
             else
-              PluviometerActor(pluviometer, pluviometerActors, isAlarm :: alarms, fireStationActor)
+              PluviometerActor(pluviometer, pluviometerActors, tmpAlarms, fireStationActor)
           }
           case _ => Behaviors.stopped
         }
