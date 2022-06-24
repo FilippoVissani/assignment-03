@@ -44,7 +44,11 @@ object Main:
     })
     pluviometers
 
-  @main def main(width: Int, height: Int, rows: Int, columns: Int): Unit =
+  @main def main(): Unit =
+    val rows = 2
+    val columns = 3
+    val width = columns * 400
+    val height = rows * 400
     var port: Int = 2551
     val zones: List[Zone] = generateZones(rows, columns, Boundary(0, 0, width / columns, height / rows))
     val fireStations: List[FireStation] = generateFireStations(zones)
@@ -57,22 +61,8 @@ object Main:
       startup(port = port)(PluviometerGuardianActor(p))
       port = port + 1
     })
-    startup(port = 1200)(ViewGuardianActor(1, width, height))
-    //startup(port = 2551)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
-    //startup(port = 2552)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
-    //startup(port = 2553)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
-    //startup(port = 2554)(FireStationActor(fireStations.iterator.next(), zones.iterator.next()))
-
-    //startup(port = 2555)(PluviometerGuardianActor(pluviometers.iterator.next()))
-    //startup(port = 2556)(PluviometerGuardianActor(pluviometers.iterator.next()))
-    //startup(port = 2557)(PluviometerActor(pluviometers.iterator.next()))
-    //startup(port = 2558)(PluviometerActor(pluviometers.iterator.next()))
-    //startup(port = 2559)(PluviometerActor(pluviometers.iterator.next()))
-    //startup(port = 2560)(PluviometerActor(pluviometers.iterator.next()))
-    //ActorSystem(FireStationActor(fireStations.iterator.next(), zones.iterator.next()), "root")
-
-  @main def startNewControlPanel(): Unit =
-    startup(port = 1200)(ViewGuardianActor(1, 800, 400))
+    startup(port = 1200)(ViewGuardianActor(0, width, height))
+    startup(port = 1201)(ViewGuardianActor(1, width, height))
 
   def startup[X](file: String = "cluster", port: Int)(root: => Behavior[X]): ActorSystem[X] =
     // Override the configuration of the port

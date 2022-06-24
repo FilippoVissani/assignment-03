@@ -8,7 +8,7 @@ import java.awt.event.{WindowAdapter, WindowEvent}
 import java.awt.{Dimension, Graphics2D, RenderingHints}
 import javax.swing.{BorderFactory, SwingUtilities}
 import scala.swing.BorderPanel.Position.{Center, North}
-import scala.swing.{Action, BorderPanel, Button, FlowPanel, Frame, Panel}
+import scala.swing.{Action, BorderPanel, Button, FlowPanel, Frame, Label, Panel}
 
 trait SwingControlPanel:
   def updatePluviometer(pluviometer: Pluviometer): Unit
@@ -23,10 +23,9 @@ object SwingControlPanel:
     val cityPanel: CityPanel = CityPanel(view.width, view.height)
 
     title = "Control Panel"
-    //size = Dimension(view.width, view.height)
     resizable = false
     contents = new BorderPanel{
-      layout(ButtonsPanel(view, cityPanel)) = North
+      layout(ButtonsPanel(view)) = North
       layout(cityPanel) = Center
     }
     visible = true
@@ -60,19 +59,26 @@ object SwingControlPanel:
   end SwingControlPanelImpl
 end SwingControlPanel
 
-sealed class ButtonsPanel(view: View, simulationPanel: CityPanel) extends FlowPanel:
+sealed class ButtonsPanel(view: View) extends FlowPanel:
   val buttonManage: Button = new Button {
     text = "Manage Zone"
+    enabled = false
     action = new Action("Manage Zone"):
       override def apply(): Unit =
+        buttonFix.enabled = true
         view.manageZonePressed()
   }
   val buttonFix: Button = new Button{
     text = "Fix Zone"
+    enabled = false
     action = new Action("Fix Zone"):
+      buttonManage.enabled = false
+      enabled = false
       override def apply(): Unit =
         view.fixZonePressed()
   }
+  val zoneIdLabel: Label = Label(s"Zone ${view.zoneId}")
+  contents += zoneIdLabel
   contents += buttonManage
   contents += buttonFix
 end ButtonsPanel
