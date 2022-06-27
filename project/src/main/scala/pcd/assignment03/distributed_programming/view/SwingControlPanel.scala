@@ -12,7 +12,7 @@ import scala.swing.{Action, BorderPanel, Button, FlowPanel, Frame, Label, Panel}
 trait SwingControlPanel:
   def updatePluviometer(pluviometer: Pluviometer): Unit
   def updateZone(zone: Zone): Unit
-  def updateFirestation(fireStation: FireStation): Unit
+  def updateFireStation(fireStation: FireStation): Unit
 
 object SwingControlPanel:
 
@@ -38,7 +38,7 @@ object SwingControlPanel:
         System.exit(-1)
     })
 
-    override def updateFirestation(fireStation: FireStation): Unit =
+    override def updateFireStation(fireStation: FireStation): Unit =
       SwingUtilities.invokeAndWait(() => {
         cityPanel.updateFireStation(fireStation)
         repaint()

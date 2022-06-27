@@ -35,7 +35,7 @@ object View:
       frame.updatePluviometer(pluviometer)
 
     override def updateFireStation(fireStation: FireStation): Unit =
-      frame.updateFirestation(fireStation)
+      frame.updateFireStation(fireStation)
 
     override def fixZonePressed(): Unit =
       viewActor ! FixZone
