@@ -39,22 +39,22 @@ object SwingControlPanel:
     })
 
     override def updateFireStation(fireStation: FireStation): Unit =
-      SwingUtilities.invokeAndWait(() => {
+      SwingUtilities.invokeLater(() => {
         cityPanel.updateFireStation(fireStation)
         repaint()
       })
 
     override def updatePluviometer(pluviometer: Pluviometer): Unit =
-      SwingUtilities.invokeAndWait(() => {
+      SwingUtilities.invokeLater(() => {
         cityPanel.updatePluviometer(pluviometer)
         repaint()
       })
 
     override def updateZone(zone: Zone): Unit =
-      SwingUtilities.invokeAndWait(() => {
+      SwingUtilities.invokeLater(() => {
         cityPanel.updateZone(zone)
         if view.zoneId == zone.id && zone.state == Alarm then
-          buttonsPanel.buttonManage.enabled = true
+          buttonsPanel.buttonManage.visible = true
         repaint()
       })
 
@@ -64,19 +64,19 @@ end SwingControlPanel
 sealed class ButtonsPanel(view: View) extends FlowPanel:
   val buttonManage: Button = new Button {
     text = "Manage Zone"
-    enabled = false
+    visible = false
     action = new Action("Manage Zone"):
       override def apply(): Unit =
-        buttonFix.enabled = true
-        this.enabled = false
+        buttonFix.visible = true
+        visible = false
         view.manageZonePressed()
   }
   val buttonFix: Button = new Button{
     text = "Fix Zone"
-    enabled = false
+    visible = false
     action = new Action("Fix Zone"):
       override def apply(): Unit =
-        this.enabled = false
+        visible = false
         view.fixZonePressed()
   }
   val zoneIdLabel: Label = Label(s"Zone ${view.zoneId}")
