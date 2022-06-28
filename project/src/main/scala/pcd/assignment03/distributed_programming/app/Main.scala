@@ -39,14 +39,14 @@ object Main:
     circularZones.foreach(x => {
       pluviometers = Pluviometer(x.id,
         Point2D(random.nextInt(x.bounds.width - 100) + x.bounds.x0 + 50, random.nextInt(x.bounds.height - 100) + x.bounds.y0 + 50),
-        15) :: pluviometers
+        5) :: pluviometers
       pluviometerId = pluviometerId + 1
     })
     pluviometers
 
   @main def main(): Unit =
-    val rows = 2
-    val columns = 3
+    val rows = 1
+    val columns = 2
     val width = columns * 400
     val height = rows * 400
     var port: Int = 2551

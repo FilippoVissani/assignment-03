@@ -1,18 +1,16 @@
 package pcd.assignment03.distributed_programming.actors
 
 import akka.actor
-
 import scala.util.{Failure, Success}
 import akka.pattern.ask
 import akka.actor.{AbstractActorWithTimers, Actor, Timers}
-import akka.actor.typed.{ActorRef, Behavior}
+import akka.actor.typed.{ActorRef, Behavior, SupervisorStrategy}
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors, TimerScheduler}
 import akka.util.Timeout
 import pcd.assignment03.distributed_programming.actors.IsAlarmResponseResult.*
 import pcd.assignment03.distributed_programming.model.Pluviometer
-
 import java.util.concurrent.ThreadLocalRandom
 import concurrent.duration.DurationInt
 import scala.concurrent.Future
@@ -21,7 +19,6 @@ object IsAlarmResponseResult extends Enumeration:
   type IsAlarmResponseResult = Value
   val Alarm, NotAlarm, Unreachable = Value
 
-
 trait PluviometerActorCommand
 object Tick extends Serializable with PluviometerActorCommand
 case class RequestIsAlarm(replyTo: ActorRef[PluviometerActorCommand]) extends Serializable with PluviometerActorCommand
@@ -29,7 +26,6 @@ case class IsAlarmResponse(isAlarm: IsAlarmResponseResult) extends Serializable 
 case class IsMyZoneRequestPluviometer(zoneId: Int, replyTo: ActorRef[PluviometerActorCommand]) extends Serializable with PluviometerActorCommand
 case class IsMyZoneResponseFromFireStationToPluviometer(replyTo: ActorRef[FireStationActorCommand]) extends Serializable with PluviometerActorCommand
 case class IsMyZoneResponseFromPluviometerToPluviometer(replyTo: ActorRef[PluviometerActorCommand]) extends Serializable with PluviometerActorCommand
-
 
 val pluviometerService = ServiceKey[PluviometerActorCommand]("pluviometerService")
 
@@ -40,8 +36,8 @@ object PluviometerActor:
             alarms: List[IsAlarmResponseResult] = List(),
             fireStationActor: Option[ActorRef[FireStationActorCommand]] = Option.empty): Behavior[PluviometerActorCommand] =
     Behaviors.setup[PluviometerActorCommand] { ctx =>
-      ctx.system.receptionist ! Receptionist.register(pluviometerService, ctx.self)
       Behaviors.withTimers { timers =>
+        ctx.system.receptionist ! Receptionist.register(pluviometerService, ctx.self)
         timers.startTimerAtFixedRate(Tick, 5.seconds)
         PluviometerActorLogic(ctx, pluviometer, pluviometerActors, alarms, fireStationActor)
       }
@@ -80,10 +76,11 @@ object PluviometerActor:
       }
       case RequestIsAlarm(replyTo) => {
         ctx.log.debug(s"Received RequestIsAlarm")
-        if ThreadLocalRandom.current().nextFloat(20) > pluviometer.threshold then
-          replyTo ! IsAlarmResponse(Alarm)
-        else
-          replyTo ! IsAlarmResponse(NotAlarm)
+        if ThreadLocalRandom.current().nextBoolean() then
+          if ThreadLocalRandom.current().nextFloat(20) > pluviometer.threshold then
+            replyTo ! IsAlarmResponse(Alarm)
+          else
+            replyTo ! IsAlarmResponse(NotAlarm)
         Behaviors.same
       }
       case IsAlarmResponse(isAlarm) => {

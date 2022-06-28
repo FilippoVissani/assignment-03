@@ -29,6 +29,9 @@ object PluviometerGuardianActor:
           listings.foreach(actor => actor ! UpdatePluviometer(pluviometer))
           Behaviors.same
         }
-        case _ => Behaviors.stopped
+        case _ => {
+          ctx.log.debug("Received Stop")
+          Behaviors.stopped
+        }
       }
     }.narrow
