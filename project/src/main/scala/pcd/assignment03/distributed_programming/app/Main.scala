@@ -45,10 +45,10 @@ object Main:
     pluviometers
 
   @main def main(): Unit =
-    val rows = 1
+    val rows = 2
     val columns = 2
-    val width = columns * 400
-    val height = rows * 400
+    val width = columns * 200
+    val height = rows * 200
     var port: Int = 2551
     val zones: List[Zone] = generateZones(rows, columns, Boundary(0, 0, width / columns, height / rows))
     val fireStations: List[FireStation] = generateFireStations(zones)
