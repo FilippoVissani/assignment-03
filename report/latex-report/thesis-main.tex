@@ -142,7 +142,7 @@ Introducendo la programmazione ad attori nel programma devono essere considerati
 %----------------------------------------------------------------------------------------
 
 \section{Distributed Programming}
-Il primo problema da considerare è quello della divisione in zone senza sovrapposizioni e aree vuote. Per questo è conveniente considerare le suddivisioni sempre seguendo la griglia CxR. Quindi, considerando anche che una zona può avere al massimo tre pluviometri e che il numero di pluviometri è fissato a sei, si possono avere da un minimo di due a un massimo di sei zone. Ogni zona deve essere definita da dei limiti spaziali che stabilisco anche la sua posizione all'interno della città.
+Il primo problema da considerare è quello della divisione in zone senza sovrapposizioni e aree vuote. Per questo è conveniente considerare le suddivisioni sempre seguendo la griglia CxR. Quindi, considerando anche che una zona può avere al massimo tre pluviometri e che il numero di pluviometri è fissato a sei, si possono avere da un minimo di due a un massimo di sei zone. Ogni zona deve essere definita da dei limiti spaziali che stabiliscono anche la sua posizione all'interno della città.
 
 L'assegnamento dei sei pluviometri deve essere gestito correttamente, gestendo tutte le casistiche descritte per le zone. Non devono essere presenti zone senza pluviometri e all'interno di una zona non possono essere presenti più di tre pluviometri. Bisogna anche considerare i casi in cui le zone non hanno lo stesso numero di pluviometri; ad esempio, con quattro zone si ottengono due zone con due pluviometri e altre due zone con un pluviometro.
 
@@ -159,7 +159,7 @@ L'attore Root si occupa di generare gli attori che gestiscono View, Controller e
 
 Il comportamento del sistema viene descritto in Figura (Figura: \ref{fig:api})
 All'avvio della simulazione il ControllerActor richiede lo stato a tutti i BodyActor, che rispondono come specificato nel pattern Request-Response. Una volta ricevuto lo stato di tutti i corpi, il Controller ha a disposizione un'immagine dell'iterazione corrente della simulazione, che replica su tutti i corpi. A questo punto i corpi possono aggiornare la loro posizione sfruttando lo stato dell'iterazione precedente.
-Una volta aggiornata la posizione, i corpi inviano nuovamente il loro stato al Controller, il quale, dopo ricevuto il nuovo stato di tutti i corpi, lo replica sulla View contattando l'attore che la gestisce.
+Una volta aggiornata la posizione, i corpi inviano nuovamente il loro stato al Controller, il quale, dopo aver ricevuto il nuovo stato di tutti i corpi, lo replica sulla View contattando l'attore che la gestisce.
 La \textit{View} (Figura \ref{fig:apgui}) oltre a rappresentare lo stato corrente della simulazione, riporta il tempo virtuale e l'iterazione correnti.
 L'interfaccia grafica dispone di quattro pulsanti:
 \begin{itemize}
