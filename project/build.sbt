@@ -2,7 +2,7 @@ name := "project"
 
 version := "1.0"
 
-scalaVersion := "3.1.1"
+scalaVersion := "3.1.3"
 
 lazy val akkaVersion = "2.6.19"
 lazy val akkaGroup = "com.typesafe.akka"
